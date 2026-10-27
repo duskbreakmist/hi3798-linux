@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+/dts-v1/;
+#include "hi3798mv100.dtsi"
+/ {
+	model = "Hi3798MV100 experimental diagnostic target";
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+	memory@0 {
+		device_type = "memory";
+		reg = <0 0x40000000>;
+	};
+};
+&uart0 {
+	status = "okay";
+};

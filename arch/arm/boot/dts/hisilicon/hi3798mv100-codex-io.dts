@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+/* Optional I/O probing; not the default first-boot DTB. */
+#include "hi3798mv100-codex.dts"
+&usb_phy0 {
+	status = "okay";
+};
+&usb_phy1 {
+	status = "okay";
+};
+&ehci0 {
+	status = "okay";
+};
+&ehci1 {
+	status = "okay";
+};
+&emmc {
+	status = "okay";
+};
+&mdio {
+	status = "okay";
+};
+&eth0 {
+	status = "okay";
+};

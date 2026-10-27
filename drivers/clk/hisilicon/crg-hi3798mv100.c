@@ -1,0 +1,390 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Hi3798MV100 Clock and Reset Generator Driver
+ * Copyright (c) 2016 HiSilicon Technologies Co., Ltd.
+ * MV100 tables from loonpn/ec6108v9c-linux-kernel, commit 8677b406968b.
+ * Registration and removal follow Linux 6.12's Hi3798MV100 driver.
+ */
+#include <dt-bindings/clock/hi3798mv100-crg.h>
+#include <linux/clk-provider.h>
+#include <linux/module.h>
+#include <linux/of.h>
+#include <linux/platform_device.h>
+#include "clk.h"
+#include "crg.h"
+#include "reset.h"
+
+/* hi3798 core CRG */
+#define HI3798MV100_INNER_CLK_OFFSET		64
+#define HI3798MV100_FIXED_24M			65
+#define HI3798MV100_FIXED_25M			66
+#define HI3798MV100_FIXED_50M			67
+#define HI3798MV100_FIXED_75M			68
+#define HI3798MV100_FIXED_100M			69
+#define HI3798MV100_FIXED_150M			70
+#define HI3798MV100_FIXED_200M			71
+#define HI3798MV100_FIXED_250M			72
+#define HI3798MV100_FIXED_300M			73
+#define HI3798MV100_FIXED_400M			74
+#define HI3798MV100_MMC_MUX			75
+#define HI3798MV100_ETH_PUB_CLK			76
+#define HI3798MV100_ETH_BUS_CLK			77
+#define HI3798MV100_ETH_BUS0_CLK		78
+#define HI3798MV100_ETH_BUS1_CLK		79
+#define HI3798MV100_COMBPHY1_MUX		80
+#define HI3798MV100_FIXED_12M			81
+#define HI3798MV100_FIXED_48M			82
+#define HI3798MV100_FIXED_60M			83
+#define HI3798MV100_FIXED_166P5M		84
+#define HI3798MV100_SDIO0_MUX			85
+#define HI3798MV100_COMBPHY0_MUX		86
+#define HI3798MV100_FIXED_3M				87
+#define HI3798MV100_FIXED_15M			88
+#define HI3798MV100_FIXED_83P3M			89
+#define HI3798MV100_GPU_PP0_CLK			90
+#define HI3798MV100_GPU_PP1_CLK			91
+
+#define HI3798MV100_CRG_NR_CLKS			128
+
+static const struct hisi_fixed_rate_clock hi3798mv100_fixed_rate_clks[] = {
+	{ HISTB_OSC_CLK, "clk_osc", NULL, 0, 24000000, },
+	{ HISTB_APB_CLK, "clk_apb", NULL, 0, 100000000, },
+	{ HISTB_AHB_CLK, "clk_ahb", NULL, 0, 200000000, },
+	{ HI3798MV100_FIXED_3M, "3m", NULL, 0, 3000000, },
+	{ HI3798MV100_FIXED_12M, "12m", NULL, 0, 12000000, },
+	{ HI3798MV100_FIXED_15M, "15m", NULL, 0, 15000000, },
+	{ HI3798MV100_FIXED_24M, "24m", NULL, 0, 24000000, },
+	{ HI3798MV100_FIXED_25M, "25m", NULL, 0, 25000000, },
+	{ HI3798MV100_FIXED_48M, "48m", NULL, 0, 48000000, },
+	{ HI3798MV100_FIXED_50M, "50m", NULL, 0, 50000000, },
+	{ HI3798MV100_FIXED_60M, "60m", NULL, 0, 60000000, },
+	{ HI3798MV100_FIXED_75M, "75m", NULL, 0, 75000000, },
+	{ HI3798MV100_FIXED_83P3M, "83p3m", NULL, 0, 83333333, },
+	{ HI3798MV100_FIXED_100M, "100m", NULL, 0, 100000000, },
+	{ HI3798MV100_FIXED_150M, "150m", NULL, 0, 150000000, },
+	{ HI3798MV100_FIXED_166P5M, "166p5m", NULL, 0, 165000000, },
+	{ HI3798MV100_FIXED_200M, "200m", NULL, 0, 200000000, },
+	{ HI3798MV100_FIXED_250M, "250m", NULL, 0, 250000000, },
+};
+
+static const char *const hi3798mv100_mmc_mux_p[] = {
+		"75m", "100m", "50m", "15m" };
+static u32 hi3798mv100_mmc_mux_table[] = {0, 1, 2, 3};
+
+static struct hisi_mux_clock hi3798mv100_mux_clks[] = {
+	{ HI3798MV100_MMC_MUX, "mmc_mux", hi3798mv100_mmc_mux_p,
+		ARRAY_SIZE(hi3798mv100_mmc_mux_p), CLK_SET_RATE_PARENT,
+		0xa0, 8, 2, 0, hi3798mv100_mmc_mux_table, },
+	{ HI3798MV100_SDIO0_MUX, "sdio0_mux", hi3798mv100_mmc_mux_p,
+		ARRAY_SIZE(hi3798mv100_mmc_mux_p), CLK_SET_RATE_PARENT,
+		0x9c, 8, 2, 0, hi3798mv100_mmc_mux_table, },
+};
+
+static u32 mmc_phase_regvals[] = {0, 1, 2, 3, 4, 5, 6, 7};
+static u32 mmc_phase_degrees[] = {0, 45, 90, 135, 180, 225, 270, 315};
+
+static struct hisi_phase_clock hi3798mv100_phase_clks[] = {
+	{ HISTB_MMC_SAMPLE_CLK, "mmc_sample", "clk_mmc_ciu",
+		CLK_SET_RATE_PARENT, 0xa0, 12, 3, mmc_phase_degrees,
+		mmc_phase_regvals, ARRAY_SIZE(mmc_phase_regvals) },
+	{ HISTB_MMC_DRV_CLK, "mmc_drive", "clk_mmc_ciu",
+		CLK_SET_RATE_PARENT, 0xa0, 16, 3, mmc_phase_degrees,
+		mmc_phase_regvals, ARRAY_SIZE(mmc_phase_regvals) },
+};
+
+static const struct hisi_gate_clock hi3798mv100_gate_clks[] = {
+	/* UART */
+	{ HISTB_UART1_CLK, "clk_uart1", "3m",
+		CLK_SET_RATE_PARENT | CLK_IS_CRITICAL, 0x68, 0, 0, },
+	{ HISTB_UART2_CLK, "clk_uart2", "83p3m",
+		CLK_SET_RATE_PARENT, 0x68, 4, 0, },
+	/* I2C */
+	{ HISTB_I2C0_CLK, "clk_i2c0", "clk_apb",
+		CLK_SET_RATE_PARENT, 0x6C, 4, 0, },
+	{ HISTB_I2C1_CLK, "clk_i2c1", "clk_apb",
+		CLK_SET_RATE_PARENT, 0x6C, 8, 0, },
+	{ HISTB_I2C2_CLK, "clk_i2c2", "clk_apb",
+		CLK_SET_RATE_PARENT, 0x6C, 12, 0, },
+	/* SPI */
+	{ HISTB_SPI0_CLK, "clk_spi0", "clk_apb",
+		CLK_SET_RATE_PARENT, 0x70, 0, 0, },
+	/* SDIO */
+	{ HISTB_SDIO0_BIU_CLK, "clk_sdio0_biu", "200m",
+		CLK_SET_RATE_PARENT, 0x9c, 0, 0, },
+	{ HISTB_SDIO0_CIU_CLK, "clk_sdio0_ciu", "sdio0_mux",
+		CLK_SET_RATE_PARENT, 0x9c, 1, 0, },
+	/* EMMC */
+	{ HISTB_MMC_BIU_CLK, "clk_mmc_biu", "200m",
+		CLK_SET_RATE_PARENT, 0xa0, 0, 0, },
+	{ HISTB_MMC_CIU_CLK, "clk_mmc_ciu", "mmc_mux",
+		CLK_SET_RATE_PARENT, 0xa0, 1, 0, },
+	/* Ethernet */
+	{ HI3798MV100_ETH_BUS_CLK, "clk_bus", NULL,
+		CLK_SET_RATE_PARENT, 0xcc, 0, 0, },
+	{ HI3798MV100_ETH_PUB_CLK, "clk_pub", "clk_bus",
+		CLK_SET_RATE_PARENT, 0xcc, 1, 0, },
+	{ HISTB_ETH0_MAC_CLK, "clk_mac0", "clk_pub",
+		CLK_SET_RATE_PARENT, 0xcc, 3, 0, },
+	/* USB2 */
+	{ HISTB_USB2_BUS_CLK, "clk_u2_bus", "clk_ahb",
+		CLK_SET_RATE_PARENT, 0xb8, 0, 0, },
+	{ HISTB_USB2_PHY_CLK, "clk_u2_phy", "60m",
+		CLK_SET_RATE_PARENT, 0xb8, 4, 0, },
+	{ HISTB_USB2_12M_CLK, "clk_u2_12m", "12m",
+		CLK_SET_RATE_PARENT, 0xb8, 2, 0 },
+	{ HISTB_USB2_48M_CLK, "clk_u2_48m", "48m",
+		CLK_SET_RATE_PARENT, 0xb8, 1, 0 },
+	{ HISTB_USB2_UTMI_CLK, "clk_u2_utmi", "60m",
+		CLK_SET_RATE_PARENT, 0xb8, 5, 0 },
+	{ HI3798MV100_USB2_UTMI_CLK1, "clk_u2_utmi1", "60m",
+		CLK_SET_RATE_PARENT, 0xb8, 6, 0 },
+	{ HISTB_USB2_OTG_UTMI_CLK, "clk_u2_otg_utmi", "60m",
+		CLK_SET_RATE_PARENT, 0xb8, 3, 0 },
+	{ HISTB_USB2_PHY1_REF_CLK, "clk_u2_phy1_ref", "24m",
+		CLK_SET_RATE_PARENT, 0xbc, 0, 0 },
+	{ HISTB_USB2_PHY2_REF_CLK, "clk_u2_phy2_ref", "24m",
+		CLK_SET_RATE_PARENT, 0xbc, 2, 0 },
+	/* USB2 2 */
+	{ HI3798MV100_USB2_2_BUS_CLK, "clk_u2_2_bus", "clk_ahb",
+		CLK_SET_RATE_PARENT, 0x198, 0, 0, },
+	{ HI3798MV100_USB2_2_PHY_CLK, "clk_u2_2_phy", "60m",
+		CLK_SET_RATE_PARENT, 0x198, 4, 0, },
+	{ HI3798MV100_USB2_2_12M_CLK, "clk_u2_2_12m", "12m",
+		CLK_SET_RATE_PARENT, 0x198, 2, 0 },
+	{ HI3798MV100_USB2_2_48M_CLK, "clk_u2_2_48m", "48m",
+		CLK_SET_RATE_PARENT, 0x198, 1, 0 },
+	{ HI3798MV100_USB2_2_UTMI_CLK, "clk_u2_2_utmi", "60m",
+		CLK_SET_RATE_PARENT, 0x198, 5, 0 },
+	{ HI3798MV100_USB2_2_UTMI_CLK1, "clk_u2_2_utmi1", "60m",
+		CLK_SET_RATE_PARENT, 0x198, 6, 0 },
+	{ HI3798MV100_USB2_2_OTG_UTMI_CLK, "clk_u2_2_otg_utmi", "60m",
+		CLK_SET_RATE_PARENT, 0x198, 3, 0 },
+	{ HI3798MV100_USB2_2_PHY1_REF_CLK, "clk_u2_2_phy1_ref", "24m",
+		CLK_SET_RATE_PARENT, 0x190, 0, 0 },
+	{ HI3798MV100_USB2_2_PHY2_REF_CLK, "clk_u2_2_phy2_ref", "24m",
+		CLK_SET_RATE_PARENT, 0x190, 2, 0 },
+	/* USB3 */
+	{ HISTB_USB3_BUS_CLK, "clk_u3_bus", NULL,
+		CLK_SET_RATE_PARENT, 0xb0, 0, 0 },
+	{ HISTB_USB3_UTMI_CLK, "clk_u3_utmi", NULL,
+		CLK_SET_RATE_PARENT, 0xb0, 4, 0 },
+	{ HISTB_USB3_PIPE_CLK, "clk_u3_pipe", NULL,
+		CLK_SET_RATE_PARENT, 0xb0, 3, 0 },
+	{ HISTB_USB3_SUSPEND_CLK, "clk_u3_suspend", NULL,
+		CLK_SET_RATE_PARENT, 0xb0, 2, 0 },
+	/* FEPHY */
+	{ HI3798MV100_FEPHY_CLK, "clk_fephy", "25m",
+		CLK_SET_RATE_PARENT, 0x120, 0, 0, },
+};
+
+static struct hisi_clock_data *hi3798mv100_clk_register(
+				struct platform_device *pdev)
+{
+	struct hisi_clock_data *clk_data;
+	int i, ret;
+
+	clk_data = hisi_clk_alloc(pdev, HI3798MV100_CRG_NR_CLKS);
+	if (!clk_data)
+		return ERR_PTR(-ENOMEM);
+
+	for (i = 0; i < clk_data->clk_data.clk_num; i++)
+		clk_data->clk_data.clks[i] = ERR_PTR(-ENOENT);
+
+	/* hisi_phase_clock is resource managed */
+	ret = hisi_clk_register_phase(&pdev->dev,
+				hi3798mv100_phase_clks,
+				ARRAY_SIZE(hi3798mv100_phase_clks),
+				clk_data);
+	if (ret)
+		return ERR_PTR(ret);
+
+	ret = hisi_clk_register_fixed_rate(hi3798mv100_fixed_rate_clks,
+				     ARRAY_SIZE(hi3798mv100_fixed_rate_clks),
+				     clk_data);
+	if (ret)
+		return ERR_PTR(ret);
+
+	ret = hisi_clk_register_mux(hi3798mv100_mux_clks,
+				ARRAY_SIZE(hi3798mv100_mux_clks),
+				clk_data);
+	if (ret)
+		goto unregister_fixed_rate;
+
+	ret = hisi_clk_register_gate(hi3798mv100_gate_clks,
+				ARRAY_SIZE(hi3798mv100_gate_clks),
+				clk_data);
+	if (ret)
+		goto unregister_mux;
+
+	ret = of_clk_add_provider(pdev->dev.of_node,
+			of_clk_src_onecell_get, &clk_data->clk_data);
+	if (ret)
+		goto unregister_gate;
+
+	return clk_data;
+
+unregister_gate:
+	hisi_clk_unregister_gate(hi3798mv100_gate_clks,
+				ARRAY_SIZE(hi3798mv100_gate_clks),
+				clk_data);
+unregister_mux:
+	hisi_clk_unregister_mux(hi3798mv100_mux_clks,
+				ARRAY_SIZE(hi3798mv100_mux_clks),
+				clk_data);
+unregister_fixed_rate:
+	hisi_clk_unregister_fixed_rate(hi3798mv100_fixed_rate_clks,
+				ARRAY_SIZE(hi3798mv100_fixed_rate_clks),
+				clk_data);
+	return ERR_PTR(ret);
+}
+
+static void hi3798mv100_clk_unregister(struct platform_device *pdev)
+{
+	struct hisi_crg_dev *crg = platform_get_drvdata(pdev);
+
+	of_clk_del_provider(pdev->dev.of_node);
+
+	hisi_clk_unregister_gate(hi3798mv100_gate_clks,
+				ARRAY_SIZE(hi3798mv100_gate_clks),
+				crg->clk_data);
+	hisi_clk_unregister_mux(hi3798mv100_mux_clks,
+				ARRAY_SIZE(hi3798mv100_mux_clks),
+				crg->clk_data);
+	hisi_clk_unregister_fixed_rate(hi3798mv100_fixed_rate_clks,
+				ARRAY_SIZE(hi3798mv100_fixed_rate_clks),
+				crg->clk_data);
+}
+
+static const struct hisi_crg_funcs hi3798mv100_crg_funcs = {
+	.register_clks = hi3798mv100_clk_register,
+	.unregister_clks = hi3798mv100_clk_unregister,
+};
+
+/* hi3798CV200 sysctrl CRG */
+
+#define HI3798MV100_SYSCTRL_NR_CLKS 16
+
+static const struct hisi_gate_clock hi3798mv100_sysctrl_gate_clks[] = {
+	{ HISTB_IR_CLK, "clk_ir", "24m",
+		CLK_SET_RATE_PARENT, 0x48, 4, 0, },
+	{ HISTB_TIMER01_CLK, "clk_timer01", "24m",
+		CLK_SET_RATE_PARENT, 0x48, 6, 0, },
+	{ HISTB_UART0_CLK, "clk_uart0", "83p3m",
+		CLK_SET_RATE_PARENT | CLK_IS_CRITICAL, 0x48, 12, 0, },
+};
+
+static struct hisi_clock_data *hi3798mv100_sysctrl_clk_register(
+					struct platform_device *pdev)
+{
+	struct hisi_clock_data *clk_data;
+	int i, ret;
+
+	clk_data = hisi_clk_alloc(pdev, HI3798MV100_SYSCTRL_NR_CLKS);
+	if (!clk_data)
+		return ERR_PTR(-ENOMEM);
+
+	for (i = 0; i < clk_data->clk_data.clk_num; i++)
+		clk_data->clk_data.clks[i] = ERR_PTR(-ENOENT);
+
+	ret = hisi_clk_register_gate(hi3798mv100_sysctrl_gate_clks,
+				ARRAY_SIZE(hi3798mv100_sysctrl_gate_clks),
+				clk_data);
+	if (ret)
+		return ERR_PTR(ret);
+
+	ret = of_clk_add_provider(pdev->dev.of_node,
+			of_clk_src_onecell_get, &clk_data->clk_data);
+	if (ret)
+		goto unregister_gate;
+
+	return clk_data;
+
+unregister_gate:
+	hisi_clk_unregister_gate(hi3798mv100_sysctrl_gate_clks,
+				ARRAY_SIZE(hi3798mv100_sysctrl_gate_clks),
+				clk_data);
+	return ERR_PTR(ret);
+}
+
+static void hi3798mv100_sysctrl_clk_unregister(struct platform_device *pdev)
+{
+	struct hisi_crg_dev *crg = platform_get_drvdata(pdev);
+
+	of_clk_del_provider(pdev->dev.of_node);
+
+	hisi_clk_unregister_gate(hi3798mv100_sysctrl_gate_clks,
+				ARRAY_SIZE(hi3798mv100_sysctrl_gate_clks),
+				crg->clk_data);
+}
+
+static const struct hisi_crg_funcs hi3798mv100_sysctrl_funcs = {
+	.register_clks = hi3798mv100_sysctrl_clk_register,
+	.unregister_clks = hi3798mv100_sysctrl_clk_unregister,
+};
+
+static const struct of_device_id hi3798mv100_crg_match_table[] = {
+	{ .compatible = "hisilicon,hi3798mv100-crg",
+		.data = &hi3798mv100_crg_funcs },
+	{ .compatible = "hisilicon,hi3798mv100-sysctrl",
+		.data = &hi3798mv100_sysctrl_funcs },
+	{ }
+};
+MODULE_DEVICE_TABLE(of, hi3798mv100_crg_match_table);
+
+static int hi3798mv100_crg_probe(struct platform_device *pdev)
+{
+	struct hisi_crg_dev *crg;
+
+	crg = devm_kmalloc(&pdev->dev, sizeof(*crg), GFP_KERNEL);
+	if (!crg)
+		return -ENOMEM;
+
+	crg->funcs = of_device_get_match_data(&pdev->dev);
+	if (!crg->funcs)
+		return -ENOENT;
+
+	crg->rstc = hisi_reset_init(pdev);
+	if (!crg->rstc)
+		return -ENOMEM;
+
+	crg->clk_data = crg->funcs->register_clks(pdev);
+	if (IS_ERR(crg->clk_data)) {
+		hisi_reset_exit(crg->rstc);
+		return PTR_ERR(crg->clk_data);
+	}
+
+	platform_set_drvdata(pdev, crg);
+	return 0;
+}
+
+static void hi3798mv100_crg_remove(struct platform_device *pdev)
+{
+	struct hisi_crg_dev *crg = platform_get_drvdata(pdev);
+
+	hisi_reset_exit(crg->rstc);
+	crg->funcs->unregister_clks(pdev);
+}
+
+static struct platform_driver hi3798mv100_crg_driver = {
+	.probe          = hi3798mv100_crg_probe,
+	.remove		= hi3798mv100_crg_remove,
+	.driver         = {
+		.name   = "hi3798mv100-crg",
+		.of_match_table = hi3798mv100_crg_match_table,
+	},
+};
+
+static int __init hi3798mv100_crg_init(void)
+{
+	return platform_driver_register(&hi3798mv100_crg_driver);
+}
+core_initcall(hi3798mv100_crg_init);
+
+static void __exit hi3798mv100_crg_exit(void)
+{
+	platform_driver_unregister(&hi3798mv100_crg_driver);
+}
+module_exit(hi3798mv100_crg_exit);
+
+MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("HiSilicon Hi3798MV100 CRG Driver");

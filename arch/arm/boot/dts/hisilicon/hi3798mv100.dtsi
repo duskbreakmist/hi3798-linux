@@ -1,0 +1,199 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Based on the MV100 DTS by HiSilicon (2016-2017) and David Yang (2023).
+ * Minimal 6.12 port; no GPU, multimedia, NAND or board-specific LED setup.
+ */
+#include <dt-bindings/clock/hi3798mv100-crg.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	compatible = "hisilicon,hi3798mv100";
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&gic>;
+	aliases {
+		serial0 = &uart0;
+		mmc0 = &emmc;
+		ethernet0 = &eth0;
+	};
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0>;
+			enable-method = "hisilicon,hi3798mv100-smp";
+		};
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <1>;
+			enable-method = "hisilicon,hi3798mv100-smp";
+		};
+		cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <2>;
+			enable-method = "hisilicon,hi3798mv100-smp";
+		};
+		cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <3>;
+			enable-method = "hisilicon,hi3798mv100-smp";
+		};
+	};
+	xtal: clock-xtal {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+	};
+	gic: interrupt-controller@f8a01000 {
+		compatible = "arm,cortex-a7-gic";
+		reg = <0xf8a01000 0x1000>, <0xf8a02000 0x100>;
+		#interrupt-cells = <3>;
+		#address-cells = <0>;
+		interrupt-controller;
+	};
+	soc {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		crg: clock-controller@f8a22000 {
+			compatible = "hisilicon,hi3798mv100-crg", "syscon";
+			reg = <0xf8a22000 0x2000>;
+			#clock-cells = <1>;
+			#reset-cells = <2>;
+		};
+		sysctrl: clock-controller@f8000000 {
+			compatible = "hisilicon,hi3798mv100-sysctrl", "syscon";
+			reg = <0xf8000000 0x1000>;
+			#clock-cells = <1>;
+			#reset-cells = <2>;
+		};
+		timer: timer@f8a2a000 {
+			compatible = "arm,sp804", "arm,primecell";
+			reg = <0xf8a2a000 0x1000>;
+			interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+			arm,sp804-has-irq = <1>;
+			clocks = <&xtal>;
+			clock-names = "apb_pclk";
+		};
+		uart0: serial@f8b00000 {
+			compatible = "arm,pl011", "arm,primecell";
+			reg = <0xf8b00000 0x1000>;
+			interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&sysctrl HISTB_UART0_CLK>, <&sysctrl HISTB_UART0_CLK>;
+			clock-names = "uartclk", "apb_pclk";
+			status = "disabled";
+		};
+		perictrl: peripheral-controller@f8a20000 {
+			compatible = "syscon", "simple-mfd";
+			reg = <0xf8a20000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges = <0 0xf8a20000 0x1000>;
+			usb_phy0: usb-phy@124 {
+				compatible = "hisilicon,hi3798mv100-usb2-phy";
+				reg = <0x124 4>;
+				clocks = <&crg HISTB_USB2_PHY1_REF_CLK>;
+				resets = <&crg 0xbc 8>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "disabled";
+				usb_phy0_port0: phy@0 {
+					reg = <0>;
+					#phy-cells = <0>;
+					resets = <&crg 0xbc 9>;
+				};
+				usb_phy0_port1: phy@1 {
+					reg = <1>;
+					#phy-cells = <0>;
+					resets = <&crg 0xbc 11>;
+				};
+			};
+			usb_phy1: usb-phy@158 {
+				compatible = "hisilicon,hi3798mv100-usb2-phy";
+				reg = <0x158 4>;
+				clocks = <&crg HI3798MV100_USB2_2_PHY1_REF_CLK>;
+				resets = <&crg 0x190 8>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "disabled";
+				usb_phy1_port0: phy@0 {
+					reg = <0>;
+					#phy-cells = <0>;
+					resets = <&crg 0x190 9>;
+				};
+			};
+		};
+		ehci0: usb@f9890000 {
+			compatible = "generic-ehci";
+			reg = <0xf9890000 0x10000>;
+			interrupts = <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&crg HISTB_USB2_BUS_CLK>,
+				 <&crg HISTB_USB2_PHY_CLK>,
+				 <&crg HISTB_USB2_UTMI_CLK>,
+				 <&crg HI3798MV100_USB2_UTMI_CLK1>;
+			resets = <&crg 0xb8 12>, <&crg 0xb8 16>, <&crg 0xb8 13>, <&crg 0xb8 14>;
+			phys = <&usb_phy0_port0>, <&usb_phy0_port1>;
+			phy-names = "usb0", "usb1";
+			status = "disabled";
+		};
+		ehci1: usb@f9930000 {
+			compatible = "generic-ehci";
+			reg = <0xf9930000 0x10000>;
+			interrupts = <GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&crg HI3798MV100_USB2_2_BUS_CLK>,
+				 <&crg HI3798MV100_USB2_2_PHY_CLK>,
+				 <&crg HI3798MV100_USB2_2_UTMI_CLK>;
+			resets = <&crg 0x198 12>, <&crg 0x198 16>, <&crg 0x198 14>;
+			phys = <&usb_phy1_port0>;
+			phy-names = "usb";
+			status = "disabled";
+		};
+		emmc: mmc@f9830000 {
+			/* Controller reuse remains experimental; high-speed modes omitted. */
+			compatible = "hisilicon,hi3798cv200-dw-mshc";
+			reg = <0xf9830000 0x10000>;
+			interrupts = <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&crg HISTB_MMC_CIU_CLK>,
+				 <&crg HISTB_MMC_BIU_CLK>,
+				 <&crg HISTB_MMC_SAMPLE_CLK>,
+				 <&crg HISTB_MMC_DRV_CLK>;
+			clock-names = "ciu", "biu", "ciu-sample", "ciu-drive";
+			resets = <&crg 0xa0 4>;
+			reset-names = "reset";
+			bus-width = <8>;
+			max-frequency = <25000000>;
+			fifo-depth = <256>;
+			non-removable;
+			status = "disabled";
+		};
+		mdio: mdio@f9841100 {
+			compatible = "hisilicon,hisi-femac-mdio";
+			reg = <0xf9841100 0x10>;
+			clocks = <&crg HI3798MV100_FEPHY_CLK>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+			phy1: ethernet-phy@1 {
+				reg = <1>;
+			};
+		};
+		eth0: ethernet@f9840000 {
+			compatible = "hisilicon,hisi-femac-v2";
+			reg = <0xf9840000 0x1000>, <0xf9841300 0x200>;
+			interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&crg HISTB_ETH0_MAC_CLK>;
+			resets = <&crg 0xcc 4>, <&crg 0x120 4>;
+			reset-names = "mac", "phy";
+			phy-handle = <&phy1>;
+			phy-mode = "mii";
+			hisilicon,phy-reset-delays-us = <10000 10000 20000>;
+			status = "disabled";
+		};
+	};
+};

@@ -11,3 +11,5 @@ dtb-$(CONFIG_ARCH_HIX5HD2) += \
 	hisi-x5hd2-dkb.dtb
 dtb-$(CONFIG_ARCH_SD5203) += \
 	sd5203.dtb
+
+dtb-$(CONFIG_MACH_HI3798MV100) += hi3798mv100-codex.dtb hi3798mv100-codex-io.dtb

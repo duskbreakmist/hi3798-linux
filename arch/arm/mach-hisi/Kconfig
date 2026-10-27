@@ -13,6 +13,14 @@ if ARCH_HISI
 
 menu "Hisilicon platform type"
 
+config MACH_HI3798MV100
+	bool "HiSilicon Hi3798MV100 experimental platform"
+	depends on ARCH_MULTI_V7
+	select COMMON_CLK_HI3798MV100
+	help
+	  Experimental MV100 support. Runtime validation is still required.
+
+
 config ARCH_HI3xxx
 	bool "Hisilicon Hi36xx family"
 	depends on ARCH_MULTI_V7

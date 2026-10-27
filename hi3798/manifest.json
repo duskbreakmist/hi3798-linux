@@ -1,5 +1,5 @@
 {
-  "status": "upstream-build-baseline-not-board-bootable",
+  "status": "mv100-offline-candidate-not-boot-tested",
   "upstream_commit": "85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e",
   "source_archive_sha256": "95a588fc1ffa31df0db5ad06075c3d34b0d007007d5fce809bdd2e50bb2a3b7c",
   "community_commit": "8677b406968bd7d53b436598c99d7ffe05a3d3d2",
@@ -10,5 +10,9 @@
   "history": "shallow upstream commit; original commit and tree preserved",
   "validated_on_board": false,
   "upstream_tree": "2c29e16ea9461ea22e0d547ae9c7447d7e851e43",
-  "bootstrap_method": "archive plus exact tree and original unsigned commit hash verification"
+  "bootstrap_method": "archive plus exact tree and original unsigned commit hash verification",
+  "active_mv100_port_imported": true,
+  "current_profile": "hi3798/mv100.config",
+  "diagnostic_boot": "forced ramfs, 512 MiB, maxcpus=1, no block mounts",
+  "serial_port": "COM8 115200 8N1; receive path verified by SSH marker"
 }

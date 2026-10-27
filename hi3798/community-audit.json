@@ -1,0 +1,953 @@
+{
+  "captured": "2026-10-27",
+  "community": {
+    "url": "https://github.com/loonpn/ec6108v9c-linux-kernel",
+    "commit": "8677b406968bd7d53b436598c99d7ffe05a3d3d2",
+    "base": "7e364e56293bb98cae1b55fd835f5991c4e96e7d"
+  },
+  "ahead_by": 11,
+  "commits": [
+    {
+      "sha": "8ac51689a6272c11c3cc2a3728de6dacc10d87ff",
+      "message": "modified:   arch/arm/boot/dts/Makefile\nnew file:   arch/arm/boot/dts/hi3716cv200.dts\nnew file:   arch/arm/boot/dts/hi3716dv100.dts\nnew file:   arch/arm/boot/dts/hi3716mv410.dts\nnew file:   arch/arm/boot/dts/hi3716mv420n.dts\nnew file:   arch/arm/boot/dts/hi3796mv200.dts\nnew file:   arch/arm/boot/dts/hi3796mv200_fpga_umap6.dts\nnew file:   arch/arm/boot/dts/hi3798cv200.dts\nnew file:   arch/arm/boot/dts/hi3798mv100-ec6108v9c.dts\nnew file:   arch/arm/boot/dts/hi3798mv100.dtsi\nnew file:   arch/arm/boot/dts/hi3798mv200.dts\nnew file:   arch/arm/configs/hi3716dv100_defconfig\nnew file:   arch/arm/configs/hi3716dv100_loader_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_ca_debug_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_ca_lxc_debug_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_ca_lxc_release_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_ca_release_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_loader_ca_debug_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_loader_ca_release_defconfig\nnew file:   arch/arm/configs/hi3716mv410_420_loader_defconfig\nnew file:   arch/arm/configs/hi3716mv410_defconfig\nnew file:   arch/arm/configs/hi3716mv420_defconfig\nnew file:   arch/arm/configs/hi3716mv420n_defconfig\nnew file:   arch/arm/configs/hi3796mv100_android_defconfig\nnew file:   arch/arm/configs/hi3796mv100_defconfig\nnew file:   arch/arm/configs/hi3796mv100_loader_defconfig\nnew file:   arch/arm/configs/hi3796mv200_android_defconfig\nnew file:   arch/arm/configs/hi3796mv200_defconfig\nnew file:   arch/arm/configs/hi3796mv200_loader_defconfig\nnew file:   arch/arm/configs/hi3798cv200_android_defconfig\nnew file:   arch/arm/configs/hi3798cv200_defconfig\nnew file:   arch/arm/configs/hi3798cv200_loader_defconfig\nnew file:   arch/arm/configs/hi3798mv100_android_defconfig\nnew file:   arch/arm/configs/hi3798mv100_defconfig\nnew file:   arch/arm/configs/hi3798mv100_loader_defconfig\nnew file:   arch/arm/configs/hi3798mv200_a_defconfig\nnew file:   arch/arm/configs/hi3798mv200_android_defconfig\nnew file:   arch/arm/configs/hi3798mv200_defconfig\nnew file:   arch/arm/configs/hi3798mv200_loader_defconfig\nmodified:   arch/arm/mach-hisi/Makefile\nmodified:   arch/arm/mach-hisi/core.h\nnew file:   arch/arm/mach-hisi/headsmp.S\nmodified:   arch/arm/mach-hisi/hisilicon.c\nmodified:   arch/arm/mach-hisi/hotplug.c\nmodified:   arch/arm/mach-hisi/platsmp.c\nmodified:   drivers/clk/Makefile\nmodified:   drivers/clk/hisilicon/Kconfig\nmodified:   drivers/clk/hisilicon/Makefile\nnew file:   drivers/clk/hisilicon/crg-hi3798.c\ndeleted:    drivers/clk/hisilicon/crg-hi3798cv200.c\nmodified:   drivers/media/rc/rc-core-priv.h\nmodified:   drivers/mtd/Kconfig\nmodified:   drivers/mtd/Makefile\nmodified:   drivers/mtd/devices/Kconfig\nmodified:   drivers/mtd/devices/Makefile\nnew file:   drivers/mtd/devices/hisfc350/Kconfig\nnew file:   drivers/mtd/devices/hisfc350/Makefile\nnew file:   drivers/mtd/devices/hisfc350/hisfc350.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc350.h\nnew file:   drivers/mtd/devices/hisfc350/hisfc350_s40_spi_ids.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc350_spi_general.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc350_spi_n25q256a.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc350_spi_s25fl256s.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc_ids.c\nnew file:   drivers/mtd/devices/hisfc350/hisfc_ids.h\nnew file:   drivers/mtd/hisilicon/Kconfig\nnew file:   drivers/mtd/hisilicon/Makefile\nnew file:   drivers/mtd/hisilicon/flash_cache.c\nnew file:   drivers/mtd/hisilicon/flash_cache.h\nnew file:   drivers/mtd/hisilicon/hiflash.c\nnew file:   drivers/mtd/hisilicon/hiflash.h\nnew file:   drivers/mtd/hisilicon/hifmc100/Makefile\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3716mv410.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3796mv2x.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3798cv2x.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3798mv2x.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_host.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_host.h\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_reg.h\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_spinor.c\nnew file:   drivers/mtd/hisilicon/hifmc100/hifmc100_xnand.c\nnew file:   drivers/mtd/hisilicon/nand_ids.c\nnew file:   drivers/mtd/hisilicon/readretry/Makefile\nnew file:   drivers/mtd/hisilicon/readretry/read_retry.c\nnew file:   drivers/mtd/hisilicon/readretry/read_retry.h\nnew file:   drivers/mtd/hisilicon/readretry/read_retry_hynix.c\nnew file:   drivers/mtd/hisilicon/readretry/read_retry_micron.c\nnew file:   drivers/mtd/hisilicon/readretry/read_retry_samsung.c\nnew file:   drivers/mtd/hisilicon/readretry/read_retry_toshiba_v2012.c\nnew file:   drivers/mtd/hisilicon/readretry/read_retry_toshiba_v2013.c\nnew file:   drivers/mtd/hisilicon/regop_intf.c\nnew file:   drivers/mtd/hisilicon/spinand_driver.c\nnew file:   drivers/mtd/hisilicon/spinand_ids.c\nnew file:   drivers/mtd/hisilicon/spinor_driver.c\nnew file:   drivers/mtd/hisilicon/spinor_ids.c\nnew file:   drivers/mtd/nand/hinfc610/Kconfig\nnew file:   drivers/mtd/nand/hinfc610/Makefile\nnew file:   drivers/mtd/nand/hinfc610/hinfc610.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_cache.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_cache.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_cache.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_dump.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_ecc_count.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_ecc_dump.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_erase_count.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_inf.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_inf.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_read_count.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_dbg_read_retry.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_ecc_info.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_ecc_info.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_gen.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_gen.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_hi3716mv310.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_hifone.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_os.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_os.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_bg_bdie.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_bg_cdie.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_cg_adie.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_micron.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_samsung.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_toshiba_v2012.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_read_retry_toshiba_v2013.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hi3716mv310.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hi3798mv100.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hifone.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_rw_latch_s40.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_s40.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_sync.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_sync.h\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_sync_onfi_23.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc610_sync_toggle.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc620_gen.c\nnew file:   drivers/mtd/nand/hinfc610/hinfc620_gen.h\nnew file:   drivers/mtd/nand/hinfc_gen.c\nnew file:   drivers/mtd/nand/hinfc_gen.h\nnew file:   drivers/mtd/nand/hinfc_spl_ids.c\nmodified:   drivers/phy/hisilicon/Kconfig\nmodified:   drivers/phy/hisilicon/phy-hisi-inno-usb2.c\nnew file:   include/dt-bindings/clock/hi3716cv200-clock.h\nnew file:   include/dt-bindings/clock/hi3796mv200-clock.h\nnew file:   include/dt-bindings/clock/hi3798cv200-clock.h\nnew file:   include/dt-bindings/clock/hi3798mv100-clock.h\nnew file:   include/dt-bindings/clock/hi3798mv200-clock.h\nmodified:   include/dt-bindings/clock/histb-clock.h\nmodified:   include/linux/cpuhotplug.h\nmodified:   include/media/rc-map.h\nmodified:   include/uapi/linux/lirc.h",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T07:44:26Z"
+      }
+    },
+    {
+      "sha": "d6e765372790df347e49d5c300c001a8a0bd1fca",
+      "message": "Merge pull request #1 from loonpn/dev\n\nAdded hi3798mv100 soc based ec6108v9c support",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T08:13:33Z"
+      }
+    },
+    {
+      "sha": "459a0688e4d89d35ed134ec00659c648ccc3d18c",
+      "message": "modified:   arch/arm/configs/hi3798mv100_defconfig",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T08:39:20Z"
+      }
+    },
+    {
+      "sha": "88b3a83507e0b9ce71dbd0fbc6c594be8a337861",
+      "message": "Merge pull request #2 from loonpn/dev\n\nmodified:   arch/arm/configs/hi3798mv100_defconfig",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T08:42:35Z"
+      }
+    },
+    {
+      "sha": "fbba265131f8d5ad18c8d73a011af35f6705377c",
+      "message": "Update README",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T08:54:54Z"
+      }
+    },
+    {
+      "sha": "a757336f0a696f540da066615cf1aff359080c86",
+      "message": "Update README",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T08:59:24Z"
+      }
+    },
+    {
+      "sha": "8dcb83c4f98e95fcff96a60438049eb6948b8b68",
+      "message": "Update README",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T09:04:12Z"
+      }
+    },
+    {
+      "sha": "1d0870a520cf096a0a33ac8df8fe9e88926c0959",
+      "message": "Update README",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-27T09:07:05Z"
+      }
+    },
+    {
+      "sha": "160c02da1a92944f60d0af5916d4d94f70e9c13a",
+      "message": "Merge branch 'torvalds:master' into master",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-03-31T08:21:07Z"
+      }
+    },
+    {
+      "sha": "0eb33e81fa1e6c76a66d9dee3f410ad1672ba05e",
+      "message": "Merge branch 'torvalds:master' into master",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2023-04-03T00:55:19Z"
+      }
+    },
+    {
+      "sha": "8677b406968bd7d53b436598c99d7ffe05a3d3d2",
+      "message": "Update README\n\nAdd install instructions.",
+      "author": {
+        "name": "loonpn",
+        "email": "107356466+loonpn@users.noreply.github.com",
+        "date": "2025-04-26T15:31:57Z"
+      }
+    }
+  ],
+  "files": [
+    {
+      "filename": "README",
+      "status": "modified",
+      "disposition": "Do not import without a demonstrated MV100 dependency"
+    },
+    {
+      "filename": "arch/arm/boot/dts/Makefile",
+      "status": "modified",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3716cv200.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3716dv100.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3716mv410.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3716mv420n.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3796mv200.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3796mv200_fpga_umap6.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3798cv200.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3798mv100-ec6108v9c.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3798mv100.dtsi",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/boot/dts/hi3798mv200.dts",
+      "status": "added",
+      "disposition": "Port only MV100 board/SoC DTS into the modern hisilicon DTS directory; review every peripheral"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716dv100_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716dv100_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_ca_debug_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_ca_lxc_debug_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_ca_lxc_release_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_ca_release_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_loader_ca_debug_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_loader_ca_release_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_420_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv410_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv420_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3716mv420n_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv100_android_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv100_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv100_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv200_android_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv200_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3796mv200_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798cv200_android_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798cv200_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798cv200_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv100_android_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv100_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv100_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv200_a_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv200_android_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv200_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/configs/hi3798mv200_loader_defconfig",
+      "status": "added",
+      "disposition": "Re-derive a small configuration; do not import legacy multi-chip defconfigs"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/Makefile",
+      "status": "modified",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/core.h",
+      "status": "modified",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/headsmp.S",
+      "status": "added",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/hisilicon.c",
+      "status": "modified",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/hotplug.c",
+      "status": "modified",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "arch/arm/mach-hisi/platsmp.c",
+      "status": "modified",
+      "disposition": "Review machine mapping, SMP and cache; not integrated or runtime-validated"
+    },
+    {
+      "filename": "drivers/clk/Makefile",
+      "status": "modified",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "drivers/clk/hisilicon/Kconfig",
+      "status": "modified",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "drivers/clk/hisilicon/Makefile",
+      "status": "modified",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "drivers/clk/hisilicon/crg-hi3798.c",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "drivers/clk/hisilicon/crg-hi3798cv200.c",
+      "status": "removed",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "drivers/media/rc/rc-core-priv.h",
+      "status": "modified",
+      "disposition": "Do not import without a demonstrated MV100 dependency"
+    },
+    {
+      "filename": "drivers/mtd/Kconfig",
+      "status": "modified",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/Makefile",
+      "status": "modified",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/Kconfig",
+      "status": "modified",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/Makefile",
+      "status": "modified",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/Kconfig",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/Makefile",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350_s40_spi_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350_spi_general.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350_spi_n25q256a.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc350_spi_s25fl256s.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/devices/hisfc350/hisfc_ids.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/Kconfig",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/Makefile",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/flash_cache.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/flash_cache.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hiflash.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hiflash.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/Makefile",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3716mv410.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3796mv2x.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3798cv2x.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_clock_hi3798mv2x.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_host.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_host.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_reg.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_spinor.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/hifmc100/hifmc100_xnand.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/nand_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/Makefile",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry_hynix.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry_micron.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry_samsung.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry_toshiba_v2012.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/readretry/read_retry_toshiba_v2013.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/regop_intf.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/spinand_driver.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/spinand_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/spinor_driver.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/hisilicon/spinor_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/Kconfig",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/Makefile",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_cache.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_cache.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_cache.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_dump.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_ecc_count.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_ecc_dump.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_erase_count.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_inf.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_inf.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_read_count.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_dbg_read_retry.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_ecc_info.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_ecc_info.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_gen.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_gen.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_hi3716mv310.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_hifone.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_os.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_os.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_bg_bdie.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_bg_cdie.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_hynix_cg_adie.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_micron.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_samsung.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_toshiba_v2012.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_read_retry_toshiba_v2013.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hi3716mv310.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hi3798mv100.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch_hifone.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_rw_latch_s40.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_s40.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_sync.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_sync.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_sync_onfi_23.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc610_sync_toggle.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc620_gen.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc610/hinfc620_gen.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc_gen.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc_gen.h",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/mtd/nand/hinfc_spl_ids.c",
+      "status": "added",
+      "disposition": "Defer legacy NAND/SPI imports for this eMMC/USB-first board"
+    },
+    {
+      "filename": "drivers/phy/hisilicon/Kconfig",
+      "status": "modified",
+      "disposition": "MV100 USB2 PHY match already exists in 6.12; compare instead of replacing the driver"
+    },
+    {
+      "filename": "drivers/phy/hisilicon/phy-hisi-inno-usb2.c",
+      "status": "modified",
+      "disposition": "MV100 USB2 PHY match already exists in 6.12; compare instead of replacing the driver"
+    },
+    {
+      "filename": "include/dt-bindings/clock/hi3716cv200-clock.h",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/dt-bindings/clock/hi3796mv200-clock.h",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/dt-bindings/clock/hi3798cv200-clock.h",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/dt-bindings/clock/hi3798mv100-clock.h",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/dt-bindings/clock/hi3798mv200-clock.h",
+      "status": "added",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/dt-bindings/clock/histb-clock.h",
+      "status": "modified",
+      "disposition": "Port MV100 clock/reset support; preserve existing upstream CV200 support"
+    },
+    {
+      "filename": "include/linux/cpuhotplug.h",
+      "status": "modified",
+      "disposition": "Do not import without a demonstrated MV100 dependency"
+    },
+    {
+      "filename": "include/media/rc-map.h",
+      "status": "modified",
+      "disposition": "Do not import without a demonstrated MV100 dependency"
+    },
+    {
+      "filename": "include/uapi/linux/lirc.h",
+      "status": "modified",
+      "disposition": "Do not import without a demonstrated MV100 dependency"
+    }
+  ],
+  "note": "GitHub compare metadata inventory; file changes are not imported wholesale.",
+  "verified_reference_files": [
+    {
+      "path": "arch/arm/mach-hisi/Makefile",
+      "git_blob": "71e2f67cdce54ecd40cab3999c2050b91577151f"
+    },
+    {
+      "path": "arch/arm/mach-hisi/core.h",
+      "git_blob": "ebfc472e46c5b5a3d53dfdd920dbc56f8e8f2500"
+    },
+    {
+      "path": "arch/arm/mach-hisi/headsmp.S",
+      "git_blob": "67cfb584aa3460f285ebd2f5d90ff145d070cdad"
+    },
+    {
+      "path": "arch/arm/mach-hisi/hisilicon.c",
+      "git_blob": "3629e9ebd407d38c975a8e8f06bc9da268d2a811"
+    },
+    {
+      "path": "arch/arm/mach-hisi/platsmp.c",
+      "git_blob": "512fb8dc1f1f46cfc418a75981ae2c8aa37f3e43"
+    },
+    {
+      "path": "arch/arm/mach-hisi/hotplug.c",
+      "git_blob": "da87ed5d22b86566a7f48827229ffc47fda3364b"
+    },
+    {
+      "path": "drivers/clk/hisilicon/crg-hi3798.c",
+      "git_blob": "a04c65c5a760b8513fed57e8bbc5691d71988057"
+    },
+    {
+      "path": "drivers/clk/hisilicon/Kconfig",
+      "git_blob": "fa2d9920f6077f814efdf8c051399c993a2c89af"
+    },
+    {
+      "path": "drivers/clk/hisilicon/Makefile",
+      "git_blob": "cfef47a195142fb86aaf95cdf6a8e64c12302b65"
+    },
+    {
+      "path": "include/dt-bindings/clock/histb-clock.h",
+      "git_blob": "704770ac80291e075f2adb3b786c090321faaf49"
+    },
+    {
+      "path": "include/dt-bindings/clock/hi3798mv100-clock.h",
+      "git_blob": "0d3cce0bfa53a47079ac380cacfe54bec94b8ff2"
+    },
+    {
+      "path": "arch/arm/boot/dts/hi3798mv100.dtsi",
+      "git_blob": "1dca469a931696c9ece2cb3ae47010d82c7a7a23"
+    },
+    {
+      "path": "arch/arm/boot/dts/hi3798mv100-ec6108v9c.dts",
+      "git_blob": "b16f63daffdc96c43cf2c3828a0224b7f02cf3f1"
+    }
+  ],
+  "active_kernel_changes_imported": false
+}

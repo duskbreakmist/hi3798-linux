@@ -1,0 +1,47 @@
+{
+  "status": "build-passed-not-board-validated",
+  "kernel_release": "6.12.114-hi3798-baseline+",
+  "upstream_commit": "85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e",
+  "upstream_tree": "2c29e16ea9461ea22e0d547ae9c7447d7e851e43",
+  "compiler": "arm-linux-gnueabihf-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "output_directory": "/home/ray/workplace/hi3798-linux-build/6.12-baseline",
+  "artifacts": [
+    {
+      "path": ".config",
+      "bytes": 69183,
+      "sha256": "eaa428aa792412c5eb3e3634ccfadb96541375438d55c3b8c5c5cf38df6cbebc"
+    },
+    {
+      "path": "vmlinux",
+      "bytes": 11018144,
+      "sha256": "07cee11ff323b3c183102d495b0b247e8c0a026b3adb89b497210ea27d235641"
+    },
+    {
+      "path": "arch/arm/boot/zImage",
+      "bytes": 2925936,
+      "sha256": "4b4cdf852318a3fef04724f1bffd34f18029dec1477234510a349315ea14365a"
+    },
+    {
+      "path": "drivers/devfreq/governor_simpleondemand.ko",
+      "bytes": 5852,
+      "sha256": "f8e55dc35554e53d1c198afe638e6bc5c5f144812d256174cf247a3d350d4382"
+    },
+    {
+      "path": "drivers/gpu/drm/drm_shmem_helper.ko",
+      "bytes": 18732,
+      "sha256": "f2e5e9b8bab1b4daab21936e559e85f6956af3d3520d153392d5ac416ef2733e"
+    },
+    {
+      "path": "drivers/gpu/drm/lima/lima.ko",
+      "bytes": 63124,
+      "sha256": "6a54df55be6b161f114dd15a99572170b61d13dbf0e0cec79879d438356cc372"
+    },
+    {
+      "path": "drivers/gpu/drm/scheduler/gpu-sched.ko",
+      "bytes": 39480,
+      "sha256": "2fd9e56c4dd405a0a77a81e90a981891e68d67d13bdefffe925d5bec57ea0d47"
+    }
+  ],
+  "active_mv100_port_imported": false,
+  "boot_test_performed": false
+}

@@ -1,0 +1,14 @@
+{
+  "status": "upstream-build-baseline-not-board-bootable",
+  "upstream_commit": "85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e",
+  "source_archive_sha256": "95a588fc1ffa31df0db5ad06075c3d34b0d007007d5fce809bdd2e50bb2a3b7c",
+  "community_commit": "8677b406968bd7d53b436598c99d7ffe05a3d3d2",
+  "community_base": "7e364e56293bb98cae1b55fd835f5991c4e96e7d",
+  "sdk_commit": "f4d1b6e3998e380b6607485b91f096d3a372b5e8",
+  "compiler": "arm-linux-gnueabihf-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "branch": "codex/hi3798-6.12-bringup",
+  "history": "shallow upstream commit; original commit and tree preserved",
+  "validated_on_board": false,
+  "upstream_tree": "2c29e16ea9461ea22e0d547ae9c7447d7e851e43",
+  "bootstrap_method": "archive plus exact tree and original unsigned commit hash verification"
+}

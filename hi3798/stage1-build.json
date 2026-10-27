@@ -1,27 +1,27 @@
 {
-  "status": "offline-build-passed; no candidate boot performed",
+  "status": "Thumb fix build passed; previous RAM boot reached kernel but init rejected; new candidate not booted",
   "kernel_release": "6.12.114-hi3798-mv100-exp+",
   "parent_checkpoint": "7ca29b83f661536f9cab8a586b270832d82c1f59",
-  "config_sha256": "f55b2820e21a1849d6b3f286ddcb1440587bedbc6509ed58c7a5809a1934e93e",
+  "config_sha256": "02e15a8e82a53bcb62c29a6a5da0f221bf5dabc5fce9d759ad69dcf479e4af09",
   "images": [
     {
       "path": "uImage-mv100-codex",
-      "bytes": 3210704,
-      "sha256": "5f574ae4b22ce418a5f3a94df8a3aa0af2c2f4ed25ce9f9919de7b4390e3e4c9",
+      "bytes": 3211800,
+      "sha256": "e58ef8377731e8fa96634791561115381226906328add9d4f3d11a8006c20953",
       "dtb_variant": "codex",
-      "header_crc": 1396853783,
-      "data_crc": 2873977677,
+      "header_crc": 494113278,
+      "data_crc": 2139106263,
       "load": "0x02000000",
       "entry": "0x02000000",
       "validated_on_board": false
     },
     {
       "path": "uImage-mv100-codex-io",
-      "bytes": 3210676,
-      "sha256": "c60edb7ca2bebd2eed9988b11035e66e1719978ad1a426b50efe4810c868c40c",
+      "bytes": 3211772,
+      "sha256": "28a1580dc9f4d1de95f9f8b452fe0fff3403834f158260707a00f7103e619845",
       "dtb_variant": "codex-io",
-      "header_crc": 2044273508,
-      "data_crc": 3196820552,
+      "header_crc": 3203302408,
+      "data_crc": 6585752,
       "load": "0x02000000",
       "entry": "0x02000000",
       "validated_on_board": false

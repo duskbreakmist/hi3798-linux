@@ -270,3 +270,10 @@ config ARM_PXA2xx_CPUFREQ
 	  This add the CPUFreq driver support for Intel PXA2xx SOCs.
 
 	  If in doubt, say N.
+
+config ARM_HI3798MV100_CPUFREQ
+	bool "Hi3798MV100 boot-voltage frequency scaling"
+	depends on MACH_HI3798MV100 && MFD_SYSCON
+	help
+	  Selector-only CPU frequency control, capped at the boot frequency
+	  and the QFP board's nominal 1 GHz limit. No voltage or APLL changes.

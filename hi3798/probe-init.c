@@ -3,6 +3,8 @@
  * dirty ext4 journal is never replayed. `rootboot` is the only command that
  * mounts read-write, and only when explicitly invoked. */
 #define _GNU_SOURCE
+#include <sys/ioctl.h>
+#include <linux/watchdog.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -315,6 +317,39 @@ static void sysrqwatch(int delay)
 	_exit(0);
 }
 
+
+/* One explicit RAM-only CPU-frequency trial, armed with a watchdog first. */
+static int cpu_write(const char *name, const char *value)
+{
+    char path[160]; int fd; size_t len = strlen(value);
+    snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpufreq/policy0/%s", name);
+    fd = open(path, O_WRONLY);
+    if (fd < 0) { perror(path); return -1; }
+    if (write(fd, value, len) != (ssize_t)len) { perror(path); close(fd); return -1; }
+    close(fd); return 0;
+}
+static void cpu_trial(unsigned int khz)
+{
+    int fd, secs = 8; char value[32];
+    if (khz != 400000 && khz != 600000 && khz != 800000 && khz != 1000000 && khz != 1200000 && khz != 1500000) {
+        puts("Unsupported nominal frequency"); return;
+    }
+    fd = open("/dev/watchdog0", O_WRONLY);
+    if (fd < 0) { perror("watchdog0; refusing trial"); return; }
+    if (ioctl(fd, WDIOC_SETTIMEOUT, &secs) < 0) { perror("watchdog timeout"); write(fd,"V",1); close(fd); return; }
+    puts("CPU trial watchdog armed; block filesystems remain unmounted.");
+    if (cpu_write("scaling_governor", "userspace")) goto done;
+    snprintf(value, sizeof(value), "%u", khz);
+    if (cpu_write("scaling_max_freq", value) || cpu_write("scaling_setspeed", value)) goto restore;
+    show("/sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq");
+    memtest();
+restore:
+    cpu_write("scaling_setspeed", "1000000");
+    cpu_write("scaling_max_freq", "1000000");
+done:
+    write(fd,"V",1); close(fd);
+}
+
 int main(void)
 {
 	char line[80];
@@ -342,6 +377,7 @@ int main(void)
 		}
 		else if (!strncmp(line, "fs", 2)) fsprobe();
 		else if (!strncmp(line, "memtest", 7)) memtest();
+		else if (!strncmp(line, "cpu ", 4)) cpu_trial(strtoul(line+4, NULL, 10));
 		else if (!strncmp(line, "futextest", 9)) futextest();
 		else if (!strncmp(line, "sysrqwatch", 10))
 			sysrqwatch(atoi(line + 10) > 0 ? atoi(line + 10) : 60);

@@ -25,6 +25,7 @@
 #include <linux/moduleparam.h>
 #include <linux/pm.h>
 #include <linux/property.h>
+#include <linux/of.h>
 #include <linux/reset.h>
 #include <linux/slab.h>
 #include <linux/spinlock.h>
@@ -141,7 +142,9 @@ wdt_restart(struct watchdog_device *wdd, unsigned long mode, void *cmd)
 
 	writel_relaxed(UNLOCK, wdt->base + WDTLOCK);
 	writel_relaxed(0, wdt->base + WDTCONTROL);
-	writel_relaxed(0, wdt->base + WDTLOAD);
+	/* Match the MV100 SDK nonzero restart reload. */
+	writel_relaxed(of_machine_is_compatible("hisilicon,hi3798mv100") ?
+		       0x100 : 0, wdt->base + WDTLOAD);
 	writel_relaxed(INT_ENABLE | RESET_ENABLE, wdt->base + WDTCONTROL);
 
 	/* Flush posted writes. */

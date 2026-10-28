@@ -4,6 +4,7 @@
 / {
 	model = "Hi3798MV100 experimental diagnostic target";
 	chosen {
+		bootargs = "root=/dev/sda4 rw rootwait";
 		stdout-path = "serial0:115200n8";
 	};
 	memory@0 {

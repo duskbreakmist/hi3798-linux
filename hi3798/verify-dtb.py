@@ -102,7 +102,7 @@ for variant in ('codex', 'codex-io'):
     for name in ('usb@f9890000', 'usb@f9930000', 'mmc@f9830000', 'mdio@f9841100', 'ethernet@f9840000'):
         assert strings(tree['/soc/' + name]['status']) == ['okay' if variant == 'codex-io' else 'disabled']
     assert cells(tree['/soc/mmc@f9830000']['bus-width']) == [8]
-    assert cells(tree['/soc/mmc@f9830000']['max-frequency']) == [25000000]
+    assert cells(tree['/soc/mmc@f9830000']['max-frequency']) == [50000000]
     assert cells(tree['/soc/mdio@f9841100/ethernet-phy@1']['reg']) == [1]
     for name in ('usb-phy@124', 'usb-phy@158'):
         assert strings(tree['/soc/peripheral-controller@f8a20000/' + name]['compatible']) == ['hisilicon,hi3798mv100-usb2-phy']

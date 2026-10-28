@@ -20,5 +20,10 @@
 	status = "okay";
 };
 &eth0 {
+	local-mac-address = [14 d1 1f 8b f1 34];
 	status = "okay";
+};
+
+&gpu {
+	status = "disabled";
 };

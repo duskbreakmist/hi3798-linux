@@ -15,9 +15,19 @@ for key in required:
     assert values.get(key) == 'y', (key, values.get(key))
 for key in ['CONFIG_HOTPLUG_CPU', 'CONFIG_CPU_ICACHE_DISABLE', 'CONFIG_CPU_DCACHE_DISABLE', 'CONFIG_ARM_LPAE']:
     assert values.get(key, 'n') == 'n', (key, values.get(key))
-for argument in ['mem=512M', 'root=/dev/ram0', 'rdinit=/init', 'maxcpus=1', 'panic=0']:
-    assert argument in values['CONFIG_CMDLINE'], argument
-assert 'root=/dev/sd' not in values['CONFIG_CMDLINE']
-assert 'root=/dev/mmc' not in values['CONFIG_CMDLINE']
-assert pathlib.Path(values['CONFIG_INITRAMFS_SOURCE'].strip('"')).is_file()
-print('MV100 offline configuration checks passed; no hardware result implied.')
+for key in ['CONFIG_ARM_THUMB','CONFIG_POSIX_TIMERS','CONFIG_COMPAT_32BIT_TIME',
+            'CONFIG_PROC_SYSCTL','CONFIG_BINFMT_SCRIPT','CONFIG_SHMEM']:
+    if values.get(key) != 'y': raise SystemExit('Required userspace feature missing: '+key)
+cmd=values['CONFIG_CMDLINE']
+assert 'mem=512M' in cmd and 'panic=0' in cmd
+assert 'maxcpus=' not in cmd
+if 'root=/dev/ram0' in cmd:
+    assert 'rdinit=/init' in cmd
+    assert pathlib.Path(values['CONFIG_INITRAMFS_SOURCE'].strip('"')).is_file()
+elif 'root=/dev/sda4' in cmd or 'root=/dev/mmcblk0p4' in cmd:
+    assert 'rootwait' in cmd and 'rdinit=' not in cmd
+    assert values.get('CONFIG_INITRAMFS_SOURCE') == '""'
+    assert values.get('CONFIG_CMDLINE_PARTITION') == 'y'
+else:
+    raise SystemExit('Unrecognized rootfs profile')
+print('MV100 configuration passed; hardware results require separate tests.')

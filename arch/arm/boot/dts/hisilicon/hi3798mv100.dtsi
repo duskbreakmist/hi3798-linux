@@ -61,6 +61,24 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
+		gpu: gpu@f9200000 {
+			compatible = "hisilicon,hi3798mv100-mali", "arm,mali-450";
+			reg = <0xf9200000 0x30000>;
+			interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "gp", "gpmmu", "pp0", "ppmmu0",
+				"pp1", "ppmmu1", "pmu", "pp";
+			clocks = <&crg HI3798MV100_GPU_BUS_CLK>, <&crg HI3798MV100_GPU_GP_CLK>;
+			clock-names = "bus", "core";
+			resets = <&crg 0xd4 4>;
+			status = "disabled";
+		};
 		crg: clock-controller@f8a22000 {
 			compatible = "hisilicon,hi3798mv100-crg", "syscon";
 			reg = <0xf8a22000 0x2000>;
@@ -72,6 +90,14 @@
 			reg = <0xf8000000 0x1000>;
 			#clock-cells = <1>;
 			#reset-cells = <2>;
+		};
+		/* Same SP805 base and reset mechanism as the SDK restart path. */
+		watchdog@f8a2c000 {
+			compatible = "arm,sp805", "arm,primecell";
+			arm,primecell-periphid = <0x00141805>;
+			reg = <0xf8a2c000 0x1000>;
+			clocks = <&xtal>, <&xtal>;
+			clock-names = "wdogclk", "apb_pclk";
 		};
 		timer: timer@f8a2a000 {
 			compatible = "arm,sp804", "arm,primecell";

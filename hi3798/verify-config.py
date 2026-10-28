@@ -17,7 +17,7 @@ required = {
     'CONFIG_USER_NS': 'y', 'CONFIG_NET_NS': 'y',
     'CONFIG_SECCOMP_FILTER': 'y', 'CONFIG_CGROUP_BPF': 'y',
     'CONFIG_VETH': 'y', 'CONFIG_BRIDGE': 'y',
-    'CONFIG_OVERLAY_FS': 'y', 'CONFIG_DRM_LIMA': 'm',
+    'CONFIG_OVERLAY_FS': 'y', 'CONFIG_DRM_LIMA': 'y',
 }
 errors = [f'{key}: expected {value}, got {config.get(key)}'
           for key, value in required.items() if config.get(key) != value]

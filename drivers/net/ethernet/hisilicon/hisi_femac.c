@@ -508,8 +508,7 @@ static netdev_tx_t hisi_femac_net_xmit(struct sk_buff *skb,
 	val &= BIT_TX_READY;
 	if (!val) {
 		hisi_femac_irq_enable(priv, IRQ_INT_TX_PER_PACKET);
-		dev->stats.tx_dropped++;
-		dev->stats.tx_fifo_errors++;
+		/* The stack retries this skb; no packet has been dropped. */
 		netif_stop_queue(dev);
 		return NETDEV_TX_BUSY;
 	}
@@ -517,8 +516,7 @@ static netdev_tx_t hisi_femac_net_xmit(struct sk_buff *skb,
 	if (unlikely(!CIRC_SPACE(txq->head, txq->tail,
 				 txq->num))) {
 		hisi_femac_irq_enable(priv, IRQ_INT_TX_PER_PACKET);
-		dev->stats.tx_dropped++;
-		dev->stats.tx_fifo_errors++;
+		/* The stack retries this skb; no packet has been dropped. */
 		netif_stop_queue(dev);
 		return NETDEV_TX_BUSY;
 	}

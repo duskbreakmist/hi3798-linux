@@ -57,3 +57,15 @@ YMODEM to RAM 0x10000000 and bootm that address; it has no flash/saveenv operati
 A stall may require a physical reset/power cycle. The saved old boot path is
 unchanged. Never assume the existing SSD or eMMC rootfs is safe to mount merely
 because this offline build succeeded.
+
+## SSD flash checkpoint (2026-10-28)
+
+build-mv100.sh configure/build now defaults to the SSD profile (root=/dev/sda4).
+MV100_PROFILE=direct retains eMMC root; MV100_PROFILE=diagnostic builds RAM init.
+Required host packages include the ARM cross toolchain, make, Python and libssl-dev.
+RTL8188E NIC firmware is embedded from the existing SDK; provenance is under
+hi3798/firmware/rtlwifi/. Firmware sources and board MAC are specific to this target.
+NTFS3, FUSE, rtl8xxxu and HID are built in. GPU is compiled in but its DT node is
+disabled: one Mesa draw passed, subsequent repeated draws hung the board.
+Do not enable it by default or claim display/media support. No DVFS is enabled.
+The user's validation policy is one basic test per feature, without repeated stress.

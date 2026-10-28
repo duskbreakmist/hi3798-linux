@@ -9,18 +9,24 @@ export KBUILD_BUILD_TIMESTAMP='2026-10-27 00:00:00 +0000'
 export SOURCE_DATE_EPOCH=1793059200
 export KBUILD_BUILD_VERSION=1
 action=${1:-build}
+profile=${MV100_PROFILE:-ssd}
 mkdir -p "$out"
 case "$action" in
   configure)
-    python3 "$src/hi3798/make-initramfs.py" "$out/probe-root"
-    KCONFIG_ALLCONFIG="$src/hi3798/mv100.config" make -C "$src" O="$out" allnoconfig
-    "$src/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/probe-root/probe.cpio"
+    python3 "$src/hi3798/make-profile.py" "$profile" "$out/requested.config"
+    if [ "$profile" = diagnostic ]; then
+      python3 "$src/hi3798/make-initramfs.py" "$out/probe-root"
+    fi
+    KCONFIG_ALLCONFIG="$out/requested.config" make -C "$src" O="$out" allnoconfig
+    if [ "$profile" = diagnostic ]; then
+      "$src/scripts/config" --file "$out/.config" --set-str INITRAMFS_SOURCE "$out/probe-root/probe.cpio"
+    fi
     make -C "$src" O="$out" olddefconfig
     python3 "$src/hi3798/verify-mv100.py" "$out/.config"
     ;;
   build)
     python3 "$src/hi3798/verify-mv100.py" "$out/.config"
-    make -C "$src" O="$out" -j"${JOBS:-8}" zImage modules hisilicon/hi3798mv100-codex.dtb hisilicon/hi3798mv100-codex-io.dtb
+    make -C "$src" O="$out" -j"${JOBS:-14}" zImage modules hisilicon/hi3798mv100-codex.dtb hisilicon/hi3798mv100-codex-io.dtb
     python3 "$src/hi3798/package-mv100.py" "$out"
     python3 "$src/hi3798/verify-dtb.py" "$out"
     ;;

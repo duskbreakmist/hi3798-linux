@@ -172,6 +172,16 @@ static const struct hisi_gate_clock hi3798mv100_gate_clks[] = {
 		CLK_SET_RATE_PARENT, 0xb0, 3, 0 },
 	{ HISTB_USB3_SUSPEND_CLK, "clk_u3_suspend", NULL,
 		CLK_SET_RATE_PARENT, 0xb0, 2, 0 },
+	/* GPU gates verified against the SDK MV100 CRG 0xd4 definitions.
+	 * Keep all PP gates enabled while the shared core clock is in use. */
+	{ HI3798MV100_GPU_BUS_CLK, "clk_gpu_bus", "200m",
+		CLK_SET_RATE_PARENT, 0xd4, 0, 0 },
+	{ HI3798MV100_GPU_GP_CLK, "clk_gpu_gp", "clk_gpu_pp0",
+		CLK_SET_RATE_PARENT, 0xd4, 8, 0 },
+	{ HI3798MV100_GPU_PP0_CLK, "clk_gpu_pp0", "clk_gpu_pp1",
+		CLK_SET_RATE_PARENT, 0xd4, 9, 0 },
+	{ HI3798MV100_GPU_PP1_CLK, "clk_gpu_pp1", "200m",
+		CLK_SET_RATE_PARENT, 0xd4, 10, 0 },
 	/* FEPHY */
 	{ HI3798MV100_FEPHY_CLK, "clk_fephy", "25m",
 		CLK_SET_RATE_PARENT, 0x120, 0, 0, },

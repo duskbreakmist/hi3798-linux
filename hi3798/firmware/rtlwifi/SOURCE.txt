@@ -1,0 +1,28 @@
+Extracted Array_MP_8188E_T_FW_NIC from SDK /home/ray/workplace/HiSTBLinux/source/component/wifi/drv/usb_rtl8188eu/rtl8188EUS_linux_v4.3.24_16705.20160509/hal/phydm/rtl8188e/halhwimg8188e_t_fw.c
+SHA256 433ec7984ded5c488cf129256b56b71e01f3c2a5b616347870a00d8c9ea133a5
+/******************************************************************************
+*
+* Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of version 2 of the GNU General Public License as
+* published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program; if not, write to the Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+*
+*
+******************************************************************************/
+
+/*Image2HeaderVersion: 2.7*/
+#include "mp_precomp.h"
+#include "../phydm_precomp.h"
+
+#if (RTL8188E_T_SUPPORT == 1)
+#if (defined(CONFIG_AP_WOWLAN) || (DM_ODM_SUPPORT_TYPE & (ODM_AP)))

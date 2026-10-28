@@ -1,0 +1,10 @@
+{
+  "base_commit": "35efe7dc9d91238fe886f59e2de95610d4d65316",
+  "flashed_image_sha256": "5255e689d9ada41f855ee045e3fe41f60289e419b05d476e7f79bb5da8511384",
+  "root": "/dev/sda4",
+  "ntfs": "/dev/sda3 ntfs3 iocharset=utf8",
+  "wifi": "0bda:0179 rtl8xxxu; firmware and one scan passed; not associated",
+  "gpu": "compiled=y, DT disabled after repeated-render hang",
+  "profile": "ssd",
+  "firmware_sha256": "433ec7984ded5c488cf129256b56b71e01f3c2a5b616347870a00d8c9ea133a5"
+}

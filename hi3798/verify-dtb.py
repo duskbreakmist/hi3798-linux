@@ -72,7 +72,13 @@ for variant in ('codex', 'codex-io'):
     assert strings(tree['/chosen']['stdout-path']) == ['serial0:115200n8']
     assert cells(tree['/soc/timer@f8a2a000']['interrupts']) == [0, 26, 4]
     assert cells(tree['/clock-xtal']['clock-frequency']) == [24000000]
-    assert not any('gpu@' in p or 'display@' in p for p in tree)
+    assert not any('display@' in p for p in tree)
+    gpu = tree['/soc/gpu@f9200000']
+    assert strings(gpu['compatible']) == ['hisilicon,hi3798mv100-mali', 'arm,mali-450']
+    assert cells(gpu['reg']) == [0xf9200000, 0x30000]
+    assert cells(gpu['interrupts']) == [0,94,4]*8
+    assert strings(gpu['interrupt-names']) == ['gp','gpmmu','pp0','ppmmu0','pp1','ppmmu1','pmu','pp']
+    assert strings(gpu['status']) == ['disabled']
     phandles = {cells(node['phandle'])[0]: node for node in tree.values() if 'phandle' in node}
     clock_references, reset_references = 0, 0
     for name, node in tree.items():

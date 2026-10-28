@@ -1,0 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+/* Separate experiment: the normal display variant keeps the GPU disabled. */
+#include "hi3798mv100-codex-display.dts"
+&gpu {
+    status = "okay";
+};

@@ -112,3 +112,15 @@ for variant in ('codex', 'codex-io'):
 assert subprocess.check_output(['git', '-C', str(src), 'diff', 'upstream/linux-6.12.y', '--', 'drivers/clk/hisilicon/crg-hi3798cv200.c']) == b''
 (out / 'dtb-verification.json').write_text(json.dumps(records, indent=2) + '\n')
 print(json.dumps(records, indent=2))
+
+display_path = out / 'arch/arm/boot/dts/hisilicon/hi3798mv100-codex-display.dtb'
+if display_path.exists():
+    display_tree = fdt(display_path)
+    fb = display_tree['/chosen/framebuffer@3e000000']
+    reserved = display_tree['/reserved-memory/framebuffer@3e000000']
+    assert cells(fb['reg']) == cells(reserved['reg']) == [0x3e000000, 0x800000]
+    assert 'no-map' in reserved
+    assert cells(fb['width']) == [1920] and cells(fb['height']) == [1080]
+    assert cells(fb['stride']) == [7680]
+    assert strings(fb['format']) == ['x8r8g8b8']
+    print('Display framebuffer reservation passed')

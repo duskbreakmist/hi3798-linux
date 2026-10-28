@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+#include "hi3798mv100-codex-io.dts"
+/ {
+    reserved-memory {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges;
+        framebuffer@3e000000 {
+            reg = <0x3e000000 0x800000>;
+            no-map;
+        };
+    };
+    chosen {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges;
+        framebuffer@3e000000 {
+            compatible = "simple-framebuffer";
+            reg = <0x3e000000 0x800000>;
+            width = <1920>;
+            height = <1080>;
+            stride = <7680>;
+            format = "x8r8g8b8";
+            status = "okay";
+        };
+    };
+};

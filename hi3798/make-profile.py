@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import re, sys
 root=Path(__file__).resolve().parent
@@ -15,5 +16,6 @@ for path in paths:
 if profile == 'diagnostic':
     values['CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE'] = '# CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE is not set'
     values['CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE'] = 'CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE=y'
-    values['CONFIG_CMDLINE'] = values['CONFIG_CMDLINE'][:-1] + ' hi3798mv100_cpufreq.allow_overclock=1' + chr(34)
+    if os.environ.get('MV100_CPU_EXPERIMENT') == '1':
+        values['CONFIG_CMDLINE'] = values['CONFIG_CMDLINE'][:-1] + ' hi3798mv100_cpufreq.allow_overclock=1' + chr(34)
 Path(sys.argv[2]).write_text('\n'.join(values.values())+'\n')

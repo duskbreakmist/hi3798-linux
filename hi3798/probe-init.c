@@ -1,3 +1,5 @@
+#include <linux/fb.h>
+#include <sys/reboot.h>
 // SPDX-License-Identifier: GPL-2.0-only
 /* RAM-only diagnostic. `fs` mounts block devices read-only with noload, so a
  * dirty ext4 journal is never replayed. `rootboot` is the only command that
@@ -328,6 +330,13 @@ static int cpu_write(const char *name, const char *value)
     if (write(fd, value, len) != (ssize_t)len) { perror(path); close(fd); return -1; }
     close(fd); return 0;
 }
+static void probe_disarm_watchdog(int fd)
+{
+    if (write(fd, "V", 1) != 1)
+        perror("watchdog disarm");
+    close(fd);
+}
+
 static void cpu_trial(unsigned int khz)
 {
     int fd, secs = 8; char value[32];
@@ -336,7 +345,7 @@ static void cpu_trial(unsigned int khz)
     }
     fd = open("/dev/watchdog0", O_WRONLY);
     if (fd < 0) { perror("watchdog0; refusing trial"); return; }
-    if (ioctl(fd, WDIOC_SETTIMEOUT, &secs) < 0) { perror("watchdog timeout"); write(fd,"V",1); close(fd); return; }
+    if (ioctl(fd, WDIOC_SETTIMEOUT, &secs) < 0) { perror("watchdog timeout"); probe_disarm_watchdog(fd); return; }
     puts("CPU trial watchdog armed; block filesystems remain unmounted.");
     if (cpu_write("scaling_governor", "userspace")) goto done;
     snprintf(value, sizeof(value), "%u", khz);
@@ -347,7 +356,68 @@ restore:
     cpu_write("scaling_setspeed", "1000000");
     cpu_write("scaling_max_freq", "1000000");
 done:
-    write(fd,"V",1); close(fd);
+    probe_disarm_watchdog(fd);
+}
+
+static void framebuffer_pattern(void)
+{
+    const unsigned int colors[] = {0xffffffff, 0xffffff00, 0xff00ffff,
+        0xff00ff00, 0xffff00ff, 0xffff0000, 0xff0000ff, 0xff000000};
+    struct fb_var_screeninfo var;
+    struct fb_fix_screeninfo fix;
+    unsigned int *row;
+    unsigned int x, y;
+    int fd = open("/dev/fb0", O_RDWR);
+    if (fd < 0) { perror("framebuffer open"); return; }
+    if (ioctl(fd, FBIOGET_VSCREENINFO, &var) || ioctl(fd, FBIOGET_FSCREENINFO, &fix)) {
+        perror("framebuffer info"); close(fd); return;
+    }
+    printf("Framebuffer: %ux%u %ubpp stride=%u smem=%lx\n",
+        var.xres, var.yres, var.bits_per_pixel, fix.line_length, fix.smem_start);
+    if (var.bits_per_pixel != 32 || var.xres > 4096 || fix.line_length > 65536) {
+        puts("unsupported framebuffer layout"); close(fd); return;
+    }
+    if (ioctl(fd, FBIOBLANK, FB_BLANK_UNBLANK)) perror("fb unblank");
+    var.activate = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+    if (ioctl(fd, FBIOPUT_VSCREENINFO, &var)) perror("fb activate");
+    row = calloc(1, fix.line_length);
+    if (!row) { close(fd); return; }
+    for (x = 0; x < var.xres; ++x)
+        row[x] = colors[x * 8 / var.xres];
+    for (y = 0; y < var.yres; ++y)
+        if (write(fd, row, fix.line_length) != (ssize_t)fix.line_length) {
+            perror("framebuffer write"); break;
+        }
+    free(row); close(fd);
+    puts("Framebuffer color bars written once");
+}
+
+static void display_trial(void)
+{
+    int fd, module_fd, seconds = 20, result;
+    if (!access("/sys/module/mv100_display_bridge/parameters/status", R_OK)) {
+        puts("Display initialization already built in or loaded");
+        framebuffer_pattern();
+        sleep(1);
+        show("/sys/module/mv100_display_bridge/parameters/status");
+        return;
+    }
+    fd = open("/dev/watchdog0", O_WRONLY);
+    if (fd < 0) { perror("display watchdog"); return; }
+    if (ioctl(fd, WDIOC_SETTIMEOUT, &seconds) < 0) {
+        perror("display watchdog timeout"); probe_disarm_watchdog(fd); return;
+    }
+    module_fd = open("/display.ko", O_RDONLY);
+    if (module_fd < 0) { perror("display module"); goto done; }
+    puts("DISPLAY TRIAL: watchdog armed, no disk filesystem mounted");
+    result = syscall(SYS_finit_module, module_fd, "enable=1 direct_pattern=1", 0);
+    printf("DISPLAY module load result=%d errno=%d\n", result, result < 0 ? errno : 0);
+    if (!result) framebuffer_pattern();
+    sleep(1);
+    show("/sys/module/mv100_display_bridge/parameters/status");
+    close(module_fd);
+done:
+    probe_disarm_watchdog(fd);
 }
 
 int main(void)
@@ -360,11 +430,13 @@ int main(void)
 	if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL)) perror("mount devtmpfs");
 	puts("\nHI3798 MV100 EXPERIMENTAL RAM DIAGNOSTIC - block devices read-only only\n");
 	status();
-	puts("Commands: status, fs, rootboot [path], memtest, help. Reset/power cycle to return to the saved boot path.");
+	puts("Commands: status, fs, rootboot [path], memtest, display, reboot, cpu kHz, help. Reset/power cycle to return to the saved boot path.");
 	for (;;) {
 		printf("mv100-probe> ");
 		if (!fgets(line, sizeof(line), stdin)) { clearerr(stdin); sleep(1); continue; }
-		if (!strncmp(line, "status", 6)) status();
+		if (!strncmp(line, "display", 7)) display_trial();
+        else if (!strncmp(line, "reboot", 6)) { sync(); reboot(RB_AUTOBOOT); }
+        else if (!strncmp(line, "status", 6)) status();
 		else if (!strncmp(line, "rootboot", 8)) {
 			char *argument = line + 8;
 			char *end;
@@ -383,6 +455,6 @@ int main(void)
 			sysrqwatch(atoi(line + 10) > 0 ? atoi(line + 10) : 60);
 		else
 			puts("Commands: status, fs, rootboot [path], futextest, memtest, "
-			     "sysrqwatch [seconds], help. rootboot defaults to /sbin/init.");
+			     "sysrqwatch [seconds], display, reboot, cpu kHz, help. rootboot defaults to /sbin/init.");
 	}
 }

@@ -213,3 +213,13 @@ config TINYDRM_ST7735R
 	  * Okaya RH128128T 1.44" 128x128 TFT
 
 	  If M is selected the module will be called st7735r.
+
+config HI3798MV100_DISPLAY_INIT
+	bool "Experimental Hi3798MV100 display initialization bridge"
+	depends on MACH_HI3798MV100 && DRM_SIMPLEDRM
+	help
+	  Initialize the MV100 VDP/HDMI and G0 plane before simpledrm use.
+	  Requires the local HiSTBLinux SDK sources and prepared boot headers.
+	  Hardware initialization is skipped unless the tested reserved
+	  framebuffer is declared in the board device tree. GPU acceleration
+	  and dynamic output modes are not provided by this helper.

@@ -3,6 +3,7 @@
 
 #include <linux/iopoll.h>
 #include <linux/device.h>
+#include <linux/of.h>
 
 #include "lima_device.h"
 #include "lima_pmu.h"
@@ -35,6 +36,14 @@ static u32 lima_pmu_get_ip_mask(struct lima_ip *ip)
 	struct lima_device *dev = ip->dev;
 	u32 ret = 0;
 	int i;
+
+	/* MV100 wires both pixel processors and their L2 to domain BIT(1).
+	 * The SDK PMU configuration is {1,2,2,...,1,2,0}; domain BIT(2)
+	 * used by generic Mali450 PP1-3 power management does not exist.
+	 */
+	if (of_device_is_compatible(dev->dev->of_node,
+				    "hisilicon,hi3798mv100-mali"))
+		return BIT(0) | BIT(1);
 
 	ret |= LIMA_PMU_POWER_GP0_MASK;
 

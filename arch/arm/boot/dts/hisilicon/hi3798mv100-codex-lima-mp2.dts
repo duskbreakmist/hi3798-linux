@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+#include "hi3798mv100-codex-lima.dts"
+&gpu {
+    interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+    interrupt-names = "gp", "gpmmu", "pp0", "ppmmu0", "pp1", "ppmmu1", "pmu", "pp";
+};

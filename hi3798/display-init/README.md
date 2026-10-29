@@ -1,13 +1,19 @@
 # MV100 display initialization and Lima checkpoint
 
-Latest compositor/clock follow-up: `CLOCKS-TEARING-2026-10-29.md`.
+Latest clock/MP2 result: `GPU400-MP2-CPU1200-2026-10-29.md`.
+GPU 200..400 MHz devfreq and two-PP operation passed; the MV100-only completion
+poll fallback remains necessary. CPU 1.2 GHz failed despite a passing short
+arithmetic result; the deployed default remains 1 GHz at the firmware voltage.
+
+Earlier compositor/clock follow-up: `CLOCKS-TEARING-2026-10-29.md`.
 The user confirmed normal window dragging with compositing enabled and
 vblank_mode=xpresent. Session tooling now preserves preferences by default.
 
 GPU result and method: `LIMA-APPS-2026-10-29.md`.
-The Lima-enabled DT now uses a single PP compatibility profile. Native Mesa
-EGL/GLES2, the packaged X11 triangle, Xorg glamor and physical scanout updates
-passed. Dual-PP completion remains unresolved; no sustained stability claim.
+The `codex-lima` DT is a one-PP fallback; `codex-lima-mp2` enables both PPs
+with serialized IRQ/poll completion. Native Mesa EGL/GLES2, a 1024-square frame,
+the packaged X11 triangle and physical scanout updates passed at 400 MHz.
+The original missing IRQ cause is still unresolved; no sustained stability claim.
 
 Earlier CPU desktop profile: `DESKTOP-PERFORMANCE-2026-10-29.md`.
 The CPU fallback uses software modesetting with no Xorg shadow buffer;
@@ -70,13 +76,13 @@ CPU cap and do not automatically enable 1200/1500 MHz experiments.
 ## Limits
 
 - Fixed 1920x1080p60 initialization, not full dynamic modesetting/hotplug.
-- GPU single-frame readback and native EGL/GLES window passed with one PP.
-  Dual-PP completion errors remain open; no repeated rendering stress claim.
-- Glamor now works in the single-PP compatibility profile. The captured
-  shared-IRQ panic is fixed locally; subsequent PP1 completion timeouts led to
-  the current reduced-core DT. Earlier failed experiments remain documented.
-- The existing GPU clock-rate model still needs refinement; its reported
-  200 MHz is not an external frequency measurement. A later read-only CRG
-  snapshot showed status selector 6 (nominal 200 MHz per the MV100 SDK table).
+- GPU one- and two-PP rendering passed, including 400 MHz hardware DFS.
+  Two-PP mode needs polling for some completions; no pressure/FPS claim.
+- Glamor works with the compatibility profiles. Shared-IRQ completion is
+  serialized in two-PP mode; the captured panic and prior missing PP1 IRQs are
+  documented, not erased by the successful poll-assisted result.
+- GPU rates now come from CRG status and the SDK selector table, with a
+  dedicated DFS clock/PMC handshake. No external oscillator/voltage measurement
+  or PLL reprogramming was performed.
 - VDEC/audio/other private multimedia drivers have not been ported by this
   display change. Do not infer hardware video decode from successful GPU use.

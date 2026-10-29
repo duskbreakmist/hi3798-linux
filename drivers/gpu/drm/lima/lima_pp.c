@@ -5,6 +5,9 @@
 #include <linux/io.h>
 #include <linux/device.h>
 #include <linux/slab.h>
+#include <linux/module.h>
+#include <linux/of.h>
+#include <linux/jiffies.h>
 
 #include <drm/lima_drm.h>
 
@@ -14,6 +17,11 @@
 #include "lima_bcast.h"
 #include "lima_vm.h"
 #include "lima_regs.h"
+
+static unsigned int mv100_pp_poll_jobs;
+static unsigned int mv100_pp_seen_active;
+module_param_named(mv100_pp_poll_jobs, mv100_pp_poll_jobs, uint, 0444);
+module_param_named(mv100_pp_seen_active, mv100_pp_seen_active, uint, 0444);
 
 #define pp_write(reg, data) writel(data, ip->iomem + reg)
 #define pp_read(reg) readl(ip->iomem + reg)
@@ -65,11 +73,10 @@ static irqreturn_t lima_pp_irq_handler(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
+static irqreturn_t lima_pp_process_irqs(struct lima_ip *pp_bcast, bool poll)
 {
 	int i;
 	irqreturn_t ret = IRQ_NONE;
-	struct lima_ip *pp_bcast = data;
 	struct lima_device *dev = pp_bcast->dev;
 	struct lima_sched_pipe *pipe = dev->pipe + lima_pipe_pp;
 	struct drm_lima_m450_pp_frame *frame;
@@ -79,13 +86,14 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 	/* A completed job can already be freed while current_task still points
 	 * at it. An unrelated GP IRQ must not dereference that stale frame.
 	 */
-	if (atomic_read(&pipe->task) <= 0 || !pipe->current_task)
+	if (atomic_read(&pipe->task) <= 0 || !pipe->current_task ||
+	    (pipe->pp_poll_enabled && !pipe->pp_started))
 		return IRQ_NONE;
 
 	frame = pipe->current_task->frame;
 	num_pp = frame->num_pp;
 
-	if (shared_gp_irq) {
+	if (shared_gp_irq && !poll) {
 		bool pending = false;
 
 		/* The line may belong to GP/MMU while PP is being programmed.
@@ -115,6 +123,8 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 		 * which may miss the interrupt handling
 		 */
 		status = pp_read(LIMA_PP_STATUS);
+		if (pipe->pp_poll_enabled && (status & LIMA_PP_STATUS_RENDERING_ACTIVE))
+			mv100_pp_seen_active |= BIT(i);
 		state = pp_read(LIMA_PP_INT_STATUS);
 
 		if (state) {
@@ -134,6 +144,44 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 	}
 
 	return ret;
+}
+
+static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
+{
+	struct lima_ip *ip = data;
+	struct lima_sched_pipe *pipe = ip->dev->pipe + lima_pipe_pp;
+	unsigned long flags;
+	irqreturn_t ret;
+
+	if (!pipe->pp_poll_enabled)
+		return lima_pp_process_irqs(ip, false);
+	spin_lock_irqsave(&pipe->pp_irq_lock, flags);
+	ret = lima_pp_process_irqs(ip, false);
+	spin_unlock_irqrestore(&pipe->pp_irq_lock, flags);
+	return ret;
+}
+
+static void lima_mv100_pp_poll(struct work_struct *work)
+{
+	struct lima_sched_pipe *pipe = container_of(to_delayed_work(work),
+		struct lima_sched_pipe, pp_poll_work);
+	unsigned long flags;
+	irqreturn_t ret;
+
+	spin_lock_irqsave(&pipe->pp_irq_lock, flags);
+	if (pipe->error) {
+		pipe->pp_started = false;
+		spin_unlock_irqrestore(&pipe->pp_irq_lock, flags);
+		return;
+	}
+	ret = lima_pp_process_irqs(pipe->bcast_processor, true);
+	if (ret == IRQ_HANDLED && !pipe->pp_started)
+		mv100_pp_poll_jobs++;
+	/* Stop after one second; the existing scheduler reports real hangs. */
+	if (pipe->pp_started && atomic_read(&pipe->task) > 0 &&
+	    time_before(jiffies, pipe->pp_poll_deadline))
+		schedule_delayed_work(&pipe->pp_poll_work, msecs_to_jiffies(1));
+	spin_unlock_irqrestore(&pipe->pp_irq_lock, flags);
 }
 
 static void lima_pp_soft_reset_async(struct lima_ip *ip)
@@ -388,6 +436,12 @@ static int lima_pp_task_validate(struct lima_sched_pipe *pipe,
 static void lima_pp_task_run(struct lima_sched_pipe *pipe,
 			     struct lima_sched_task *task)
 {
+	unsigned long flags = 0;
+
+	if (pipe->pp_poll_enabled) {
+		spin_lock_irqsave(&pipe->pp_irq_lock, flags);
+		pipe->pp_started = false;
+	}
 	if (pipe->bcast_processor) {
 		struct drm_lima_m450_pp_frame *frame = task->frame;
 		struct lima_device *dev = pipe->bcast_processor->dev;
@@ -441,10 +495,20 @@ static void lima_pp_task_run(struct lima_sched_pipe *pipe,
 			pp_write(LIMA_PP_CTRL, LIMA_PP_CTRL_START_RENDERING);
 		}
 	}
+	if (pipe->pp_poll_enabled) {
+		pipe->pp_started = true;
+		pipe->pp_poll_deadline = jiffies + HZ;
+		schedule_delayed_work(&pipe->pp_poll_work, msecs_to_jiffies(1));
+		spin_unlock_irqrestore(&pipe->pp_irq_lock, flags);
+	}
 }
 
 static void lima_pp_task_fini(struct lima_sched_pipe *pipe)
 {
+	if (pipe->pp_poll_enabled) {
+		pipe->pp_started = false;
+		cancel_delayed_work(&pipe->pp_poll_work);
+	}
 	if (pipe->bcast_processor)
 		lima_pp_soft_reset_async(pipe->bcast_processor);
 	else {
@@ -458,6 +522,11 @@ static void lima_pp_task_fini(struct lima_sched_pipe *pipe)
 static void lima_pp_task_error(struct lima_sched_pipe *pipe)
 {
 	int i;
+
+	if (pipe->pp_poll_enabled) {
+		cancel_delayed_work_sync(&pipe->pp_poll_work);
+		pipe->pp_started = false;
+	}
 
 	for (i = 0; i < pipe->num_processor; i++) {
 		struct lima_ip *ip = pipe->processor[i];
@@ -516,6 +585,14 @@ int lima_pp_pipe_init(struct lima_device *dev)
 	}
 	lima_pp_task_slab_refcnt++;
 
+	pipe->pp_poll_enabled = pipe->num_processor > 1 &&
+		of_device_is_compatible(dev->dev->of_node, "hisilicon,hi3798mv100-mali");
+	if (pipe->pp_poll_enabled) {
+		spin_lock_init(&pipe->pp_irq_lock);
+		INIT_DELAYED_WORK(&pipe->pp_poll_work, lima_mv100_pp_poll);
+		dev_info(dev->dev, "MV100 two-PP completion polling enabled\n");
+	}
+
 	pipe->frame_size = frame_size;
 	pipe->task_slab = lima_pp_task_slab;
 
@@ -531,6 +608,10 @@ int lima_pp_pipe_init(struct lima_device *dev)
 
 void lima_pp_pipe_fini(struct lima_device *dev)
 {
+	struct lima_sched_pipe *pipe = dev->pipe + lima_pipe_pp;
+
+	if (pipe->pp_poll_enabled)
+		cancel_delayed_work_sync(&pipe->pp_poll_work);
 	if (!--lima_pp_task_slab_refcnt) {
 		kmem_cache_destroy(lima_pp_task_slab);
 		lima_pp_task_slab = NULL;

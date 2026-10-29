@@ -13,9 +13,12 @@
 static struct regmap *crg;
 static unsigned int boot_max;
 static unsigned int boot_rate;
+static unsigned int daily_max_khz = 1000000;
+module_param(daily_max_khz, uint, 0444);
+MODULE_PARM_DESC(daily_max_khz, "Daily CPU cap: 1000000 recovery or user-requested 1200000 kHz");
 static bool allow_overclock;
 module_param(allow_overclock, bool, 0444);
-MODULE_PARM_DESC(allow_overclock, "Expose experimental 1200/1500 MHz selectors without changing voltage; initial policy stays at boot rate");
+MODULE_PARM_DESC(allow_overclock, "Expose experimental 1500 MHz above the 1200 MHz daily cap; voltage is unchanged");
 static struct cpufreq_frequency_table mv100_freqs[] = {
     { .driver_data=6, .frequency=400000 },
     { .driver_data=7, .frequency=600000 },
@@ -37,8 +40,8 @@ static int mv100_target(struct cpufreq_policy *policy,unsigned int index)
     unsigned int sel=mv100_freqs[index].driver_data;
     int ret;
     if (mv100_freqs[index].frequency>boot_max) return -EINVAL;
-    /* High selectors must never be chosen by an automatic governor. */
-    if (mv100_freqs[index].frequency > 1000000 &&
+    /* 1500 MHz remains explicitly isolated from automatic governors. */
+    if (mv100_freqs[index].frequency > daily_max_khz &&
         (!policy->governor || strcmp(policy->governor->name, "userspace")))
         return -EINVAL;
     /* SDK: select software control, deassert trigger, set mux, trigger. */
@@ -54,7 +57,7 @@ static int mv100_policy_init(struct cpufreq_policy *policy)
 {
     cpumask_copy(policy->cpus,cpu_possible_mask);
     cpufreq_generic_init(policy,mv100_freqs,1000000);
-    /* Never raise frequency merely by registering this experimental driver. */
+    /* Start at the firmware rate; userspace selects the daily cap later. */
     policy->max=min(boot_rate, policy->cpuinfo.max_freq);
     return 0;
 }
@@ -75,7 +78,8 @@ static int __init mv100_cpufreq_init(void)
     if (IS_ERR(crg)) return PTR_ERR(crg);
     boot_rate=mv100_get(0);
     if (!boot_rate) return -ENODEV;
-    boot_max=allow_overclock ? 1500000U : min(boot_rate,1000000U);
+    if (daily_max_khz != 1000000 && daily_max_khz != 1200000) return -EINVAL;
+    boot_max=allow_overclock ? 1500000U : daily_max_khz;
     for(i=0;mv100_freqs[i].frequency!=CPUFREQ_TABLE_END;i++)
         if(mv100_freqs[i].frequency>boot_max) mv100_freqs[i].frequency=CPUFREQ_ENTRY_INVALID;
     pr_info("MV100 cpufreq: fixed boot voltage, nominal maximum %u kHz\n",boot_max);

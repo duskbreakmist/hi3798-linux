@@ -7,6 +7,7 @@
 #include <drm/gpu_scheduler.h>
 #include <linux/list.h>
 #include <linux/xarray.h>
+#include <linux/workqueue.h>
 
 struct lima_device;
 struct lima_vm;
@@ -67,6 +68,12 @@ struct lima_sched_pipe {
 	struct lima_ip *bcast_processor;
 	struct lima_ip *bcast_mmu;
 
+	/* MV100 loses some PP1 completion notifications on its shared IRQ. */
+	spinlock_t pp_irq_lock;
+	struct delayed_work pp_poll_work;
+	bool pp_poll_enabled;
+	bool pp_started;
+	unsigned long pp_poll_deadline;
 	u32 done;
 	bool error;
 	atomic_t task;

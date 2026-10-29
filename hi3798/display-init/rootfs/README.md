@@ -35,8 +35,10 @@ python3 /run/mv100-desktop-profile.py install --enable-glamor
 With a modern kernel, simpledrm, the Lima render node and the accepted marker,
 the service selects glamor. If GPU support is absent, it selects the CPU path.
 The process-local KMSRO Xorg wrapper also bypasses the override for old 4.4.
-This avoids global EGL/Mesa library replacement. MV100 currently uses one PP;
-the two-PP completion issue is documented and remains unresolved.
+This avoids global EGL/Mesa library replacement. The newer two-PP profile
+uses a documented MV100 IRQ/poll completion workaround; a one-PP fallback is
+still available. GPU devfreq covers 200..400 MHz; CPU defaults to 1 GHz because
+the 1.2 GHz runtime attempt subsequently panicked.
 The user's xfconf compositor choices persist independently of this kernel/backend
 selector. Do not reset them during a kernel deployment or use a no-compositor
 historical snapshot as the current accepted desktop preference.

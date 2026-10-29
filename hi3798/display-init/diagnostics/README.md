@@ -39,3 +39,14 @@ then enables the persistent profile only after all those steps pass.
 On failure it rolls back. Run only for a new candidate that needs validation;
 the deployed single-PP profile is already accepted, so do not repeat stress
 tests on it. MP2 and the earlier no-boot-guard trial are not the stable entry.
+
+
+## GPU 400 MHz / two PP follow-up
+
+Read `GPU400-MP2-CPU1200-2026-10-29.md` before testing. The accepted MP2 profile
+already passed one function check; do not run repeated stress loops. Clock-only
+validation uses `validate-daily-clocks.py --gpu-only`; the GPU-only flag is
+intentional because CPU 1.2 GHz failed and is not the daily setting. The raw
+`daily-cpu-check.c` is evidence/research code, not an installation recommendation.
+`lima-getparam.py` reads the official DRM ABI without GPU submissions.
+The large render helper is the same single-frame gradient at 1024x1024.

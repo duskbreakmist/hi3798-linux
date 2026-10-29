@@ -1,7 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
 /* MV100 GPU compatibility profile. PP1 completion is not yet reliable. */
 #include "hi3798mv100-codex-display.dts"
+/ {
+    gpu_opp_table: opp-table-gpu {
+        compatible = "operating-points-v2";
+        opp-200000000 { opp-hz = /bits/ 64 <200000000>; };
+        opp-250000000 { opp-hz = /bits/ 64 <250000000>; };
+        opp-300000000 { opp-hz = /bits/ 64 <300000000>; };
+        opp-345600000 { opp-hz = /bits/ 64 <345600000>; };
+        opp-375000000 { opp-hz = /bits/ 64 <375000000>; };
+        opp-400000000 { opp-hz = /bits/ 64 <400000000>; };
+    };
+};
 &gpu {
+    operating-points-v2 = <&gpu_opp_table>;
     /* Omit optional PP1 IRQs so Lima exposes and schedules only PP0. */
     interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
                  <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,

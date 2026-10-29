@@ -20,7 +20,7 @@ for key in ['CONFIG_ARM_THUMB','CONFIG_POSIX_TIMERS','CONFIG_COMPAT_32BIT_TIME',
     if values.get(key) != 'y': raise SystemExit('Required userspace feature missing: '+key)
 assert values.get('CONFIG_CMDLINE_FORCE')=='y' or values.get('CONFIG_CMDLINE_EXTEND')=='y'
 cmd=values['CONFIG_CMDLINE']
-assert 'mem=1G' in cmd and 'panic=0' in cmd
+assert 'mem=1G' in cmd and {'panic=0', 'panic=5'}.intersection(cmd.split())
 assert 'maxcpus=' not in cmd
 if 'root=/dev/ram0' in cmd:
     assert 'rdinit=/init' in cmd

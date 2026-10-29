@@ -11,7 +11,7 @@ out = Path(sys.argv[1]).resolve()
 zimage = (out / 'arch/arm/boot/zImage').read_bytes()
 assert len(zimage) % 4 == 0
 records = []
-for variant in ('codex', 'codex-io', 'codex-display', 'codex-lima'):
+for variant in ('codex', 'codex-io', 'codex-display', 'codex-lima', 'codex-lima-mp2'):
     dtb = (out / f'arch/arm/boot/dts/hisilicon/hi3798mv100-{variant}.dtb').read_bytes()
     assert struct.unpack('>I', dtb[:4])[0] == 0xd00dfeed
     payload = zimage + dtb

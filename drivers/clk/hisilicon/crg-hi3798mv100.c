@@ -44,6 +44,10 @@
 #define HI3798MV100_GPU_PP0_CLK			90
 #define HI3798MV100_GPU_PP1_CLK			91
 
+#define HI3798MV100_GPU_DFS_CLK            92
+
+struct clk *hi3798mv100_gpu_clk_register(struct device *dev, void __iomem *crg);
+
 #define HI3798MV100_CRG_NR_CLKS			128
 
 static const struct hisi_fixed_rate_clock hi3798mv100_fixed_rate_clks[] = {
@@ -180,7 +184,7 @@ static const struct hisi_gate_clock hi3798mv100_gate_clks[] = {
 		CLK_SET_RATE_PARENT, 0xd4, 8, 0 },
 	{ HI3798MV100_GPU_PP0_CLK, "clk_gpu_pp0", "clk_gpu_pp1",
 		CLK_SET_RATE_PARENT, 0xd4, 9, 0 },
-	{ HI3798MV100_GPU_PP1_CLK, "clk_gpu_pp1", "200m",
+	{ HI3798MV100_GPU_PP1_CLK, "clk_gpu_pp1", "gpu_dfs",
 		CLK_SET_RATE_PARENT, 0xd4, 10, 0 },
 	/* FEPHY */
 	{ HI3798MV100_FEPHY_CLK, "clk_fephy", "25m",
@@ -219,6 +223,13 @@ static struct hisi_clock_data *hi3798mv100_clk_register(
 				clk_data);
 	if (ret)
 		goto unregister_fixed_rate;
+
+	clk_data->clk_data.clks[HI3798MV100_GPU_DFS_CLK] =
+		hi3798mv100_gpu_clk_register(&pdev->dev, clk_data->base);
+	if (IS_ERR(clk_data->clk_data.clks[HI3798MV100_GPU_DFS_CLK])) {
+		ret = PTR_ERR(clk_data->clk_data.clks[HI3798MV100_GPU_DFS_CLK]);
+		goto unregister_mux;
+	}
 
 	ret = hisi_clk_register_gate(hi3798mv100_gate_clks,
 				ARRAY_SIZE(hi3798mv100_gate_clks),

@@ -26,7 +26,7 @@ case "$action" in
     ;;
   build)
     python3 "$src/hi3798/verify-mv100.py" "$out/.config"
-    make -C "$src" O="$out" -j"${JOBS:-14}" zImage modules hisilicon/hi3798mv100-codex.dtb hisilicon/hi3798mv100-codex-io.dtb hisilicon/hi3798mv100-codex-display.dtb hisilicon/hi3798mv100-codex-lima.dtb
+    make -C "$src" O="$out" -j"${JOBS:-14}" zImage modules hisilicon/hi3798mv100-codex.dtb hisilicon/hi3798mv100-codex-io.dtb hisilicon/hi3798mv100-codex-display.dtb hisilicon/hi3798mv100-codex-lima.dtb hisilicon/hi3798mv100-codex-lima-mp2.dtb
     python3 "$src/hi3798/package-mv100.py" "$out"
     python3 "$src/hi3798/verify-dtb.py" "$out"
     ;;

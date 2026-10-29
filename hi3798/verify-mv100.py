@@ -31,4 +31,8 @@ elif 'root=/dev/sda4' in cmd or 'root=/dev/mmcblk0p4' in cmd or values.get('CONF
     assert values.get('CONFIG_CMDLINE_PARTITION') == 'y'
 else:
     raise SystemExit('Unrecognized rootfs profile')
+import json
+for symbol in json.loads(pathlib.Path(__file__).with_name('migration-required.json').read_text()):
+    if values.get(symbol) != 'y':
+        raise SystemExit('Audited migration framework must remain built-in: '+symbol)
 print('MV100 configuration passed; hardware results require separate tests.')

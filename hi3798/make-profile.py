@@ -13,7 +13,7 @@ group.add_argument('--user-config', type=Path)
 args = parser.parse_args()
 profile = args.profile
 values = {}
-paths = [root/'mv100.config']
+paths = [root/'mv100.config', root/'migration-frameworks.config']
 if profile in ('direct', 'ssd'): paths.append(root/'direct-root.config')
 if profile == 'ssd': paths.append(root/'ssd-root.config')
 if profile == 'bootloader': paths.append(root/'bootloader-root.config')

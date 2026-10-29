@@ -36,3 +36,11 @@ config SND_PXA2XX_LIB
 
 config SND_PXA2XX_LIB_AC97
 	bool
+
+config SND_HI3798MV100_HDMI
+	tristate "Hi3798MV100 AIAO HDMI stereo PCM"
+	depends on SND && SND_ARM && MACH_HI3798MV100
+	select SND_PCM
+	help
+	  Native ALSA playback using AIAO TX3 and the MV100 HDMI transmitter.
+	  Currently supports 48 kHz, stereo, S16_LE with period polling.

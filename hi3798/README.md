@@ -111,3 +111,7 @@ SDK 的重新编译日志默认在生成对象旁的 `vendor/reports/`，不再�
 ## 配置框架补全
 
 后续已按 4.4 迁移审计补齐 ALSA、媒体、总线、RTC、thermal/hwmon 和追踪框架。见 [配置迁移与启动调查](CONFIG-MIGRATION-2026-10-29.md)。构建前检查 27 个必要内置符号，并在旧配置可用时生成完整迁移对照。框架开启不代表板载音频、VDEC 或温度驱动已完成。
+
+## HDMI 音频
+
+已接入 MV100 原生 ALSA HDMI PCM，固定 48kHz/双声道/S16_LE。声卡名 MV100HDMI；plughw 支持软件格式转换，桌面 PulseAudio 可自动选择声卡。实际出声和短连续播放已经验证。过程、边界与播放命令见 [音频记录](kernel-next-hdmi-audio-2026-10-29.md)，[烧写指南](kernel-next-flashing-guide.md)。

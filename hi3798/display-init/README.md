@@ -1,6 +1,11 @@
 # MV100 display initialization and Lima checkpoint
 
-Read `RESULTS-2026-10-29.md` for observed results, failed steps, evidence paths,
+Latest desktop profile and GPU follow-up: `DESKTOP-PERFORMANCE-2026-10-29.md`.
+The deployed desktop now uses software modesetting with no Xorg shadow buffer
+and ray's software compositor disabled; the user confirmed improved response.
+Re-deployment and 4.4 recovery instructions are in `rootfs/README.md`.
+
+Read `RESULTS-2026-10-29.md` for the earlier display/one-frame GPU results, evidence paths,
 and validation boundaries. This is a local experimental bring-up, not a claim
 that upstream Linux already contains an MV100 display-controller driver.
 
@@ -54,8 +59,11 @@ CPU cap and do not automatically enable 1200/1500 MHz experiments.
 
 - Fixed 1920x1080p60 initialization, not full dynamic modesetting/hotplug.
 - GPU single-frame readback passed; no repeated rendering stress claim.
-- fbdev Xorg desktop works; accelerated desktop composition is unverified.
+- Software modesetting desktop works; the subsequent glamor/kmsro attempt
+  did not complete and a board reboot was observed. Its cause was not captured.
+  The board is back on the persisted GPU-disabled display kernel.
 - The existing GPU clock-rate model still needs refinement; its reported
-  200 MHz is not a hardware frequency measurement.
+  200 MHz is not an external frequency measurement. A later read-only CRG
+  snapshot showed status selector 6 (nominal 200 MHz per the MV100 SDK table).
 - VDEC/audio/other private multimedia drivers have not been ported by this
   display change. Do not infer hardware video decode from successful GPU use.

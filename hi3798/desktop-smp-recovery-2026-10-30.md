@@ -55,3 +55,5 @@ Xorg 记录 glamor 初始化约 35 秒、GLX 初始化约 30 秒。EGL 全系统
 原 4.4 完整分区哈希仍为 `80a420664bee2e113b8d2c3748ce85d707f5a4071ee228810f4b562d4d3657cb`，烧录前已核实。板上备份目录 `/var/backups/mv100-desktop-20261030/` 包含 kernel-original44.bin、bootenv-before.bin、install.json。持久 bootargs root 从 mmcblk0p4 改为 sda4，rootfs_sel=1；先校验原环境 CRC，备份整个 p2，保留 bootcmd 与其他变量，写入64KiB环境后回读整个p2一致。未改 bootloader。
 
 验证范围：两次修正后 RAM 启动（包含6.12暖重启）、一次有限窗口探针、用户屏幕验收及正式烧录回读；未做长时间压力测试。当前串口 COM7/115200，TFTP/SSH 有线地址192.168.37.64。
+
+正式烧录后已执行一次 reboot：自动从 eMMC 内核进入 `/dev/sda4`，运行 6.12.114-hi3798-mv100-exp+，CPU online=0-3，SMP 0.265844 秒，Xorg 正常启动。首次 SSH 探测发生在网络就绪前而超时，随后连接成功；串口正常到登录提示。

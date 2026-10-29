@@ -1,6 +1,10 @@
-"""Apply the compositor setting to the actual user's session bus."""
+"""Inspect or explicitly adjust the actual user's compositor session."""
 from pathlib import Path
-import os, subprocess, json
+import argparse, subprocess, json
+p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compositing', choices=['keep','on','off'], default='keep')
+p.add_argument('--vblank-mode', choices=['keep','auto','xpresent','glx','off'], default='keep')
+args = p.parse_args()
 for directory in Path('/proc').iterdir():
     if not directory.name.isdigit():
         continue
@@ -17,10 +21,18 @@ for directory in Path('/proc').iterdir():
     selected.setdefault('XDG_RUNTIME_DIR','/run/user/1000')
     print(json.dumps(selected))
     prefix = ['runuser','-u','ray','--','env']+[k+'='+v for k,v in selected.items()]
-    command = ['xfconf-query','-c','xfwm4','-p','/general/use_compositing']
-    print('Before:',subprocess.check_output(prefix+command,text=True).strip())
-    subprocess.run(prefix+command+['-s','false'],check=True)
-    print('After:',subprocess.check_output(prefix+command,text=True).strip())
+    def query(name, value=None):
+        command = prefix+['xfconf-query','-c','xfwm4','-p','/general/'+name]
+        if value is not None:
+            subprocess.run(command+['-s',value],check=True)
+        return subprocess.check_output(command,text=True).strip()
+    names=['use_compositing','vblank_mode']
+    print('Before:',json.dumps({name:query(name) for name in names}))
+    if args.vblank_mode != 'keep':
+        query('vblank_mode', args.vblank_mode)
+    if args.compositing != 'keep':
+        query('use_compositing', 'true' if args.compositing=='on' else 'false')
+    print('After:',json.dumps({name:query(name) for name in names}))
     break
 else:
     raise SystemExit('No running xfwm4 session')

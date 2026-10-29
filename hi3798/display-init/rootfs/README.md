@@ -17,7 +17,14 @@ The installer preserves the supplied original fbdev configuration. The service
 selects the verified software modesetting/no-shadow profile before LightDM only
 on MV100 with a modern kernel and card0 bound to simple-framebuffer. Otherwise it
 restores the original fbdev profile, retaining the old 4.4 recovery path.
-The actual ray xfwm4 session bus is used to turn software compositing off.
+The actual ray xfwm4 session bus is used. The session helper defaults to keeping
+the user's settings; it no longer silently turns compositing off. The CPU
+fallback was initially tested without composition, but the GPU desktop's later
+tearing report was resolved with composition and XPresent enabled:
+
+```sh
+python3 /run/desktop-session-performance.py --compositing on --vblank-mode xpresent
+```
 
 After a successful guarded GPU desktop trial, enable the persistent GPU profile:
 
@@ -30,6 +37,9 @@ the service selects glamor. If GPU support is absent, it selects the CPU path.
 The process-local KMSRO Xorg wrapper also bypasses the override for old 4.4.
 This avoids global EGL/Mesa library replacement. MV100 currently uses one PP;
 the two-PP completion issue is documented and remains unresolved.
+The user's xfconf compositor choices persist independently of this kernel/backend
+selector. Do not reset them during a kernel deployment or use a no-compositor
+historical snapshot as the current accepted desktop preference.
 
 For the isolated test tools, cross-compile `apps/lima-render-image.c` with
 `arm-linux-gnueabihf-gcc -O2 -Wall -Wextra ... -ldl -o lima-render-image`, put

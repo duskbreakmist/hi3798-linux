@@ -1,14 +1,19 @@
 # MV100 display initialization and Lima checkpoint
 
-Latest GPU result and method: `LIMA-APPS-2026-10-29.md`.
+Latest compositor/clock follow-up: `CLOCKS-TEARING-2026-10-29.md`.
+The user confirmed normal window dragging with compositing enabled and
+vblank_mode=xpresent. Session tooling now preserves preferences by default.
+
+GPU result and method: `LIMA-APPS-2026-10-29.md`.
 The Lima-enabled DT now uses a single PP compatibility profile. Native Mesa
 EGL/GLES2, the packaged X11 triangle, Xorg glamor and physical scanout updates
 passed. Dual-PP completion remains unresolved; no sustained stability claim.
 
 Earlier CPU desktop profile: `DESKTOP-PERFORMANCE-2026-10-29.md`.
 The CPU fallback uses software modesetting with no Xorg shadow buffer;
-ray's compositor remains disabled in both profiles. The accepted GPU profile
-uses modesetting/glamor with a process-local generic KMSRO entry.
+the accepted GPU desktop now keeps compositing enabled with XPresent to
+address the user's window tearing report. It uses modesetting/glamor with a
+process-local generic KMSRO entry.
 Re-deployment and 4.4 recovery instructions are in `rootfs/README.md`.
 
 Read `RESULTS-2026-10-29.md` for the earlier display/one-frame GPU results, evidence paths,

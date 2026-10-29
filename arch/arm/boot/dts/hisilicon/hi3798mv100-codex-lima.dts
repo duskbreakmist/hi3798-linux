@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-/* Separate experiment: the normal display variant keeps the GPU disabled. */
+/* MV100 GPU compatibility profile. PP1 completion is not yet reliable. */
 #include "hi3798mv100-codex-display.dts"
 &gpu {
+    /* Omit optional PP1 IRQs so Lima exposes and schedules only PP0. */
+    interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
+                 <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+    interrupt-names = "gp", "gpmmu", "pp0", "ppmmu0", "pmu", "pp";
     status = "okay";
 };

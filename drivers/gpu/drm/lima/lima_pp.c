@@ -43,7 +43,15 @@ static irqreturn_t lima_pp_irq_handler(int irq, void *data)
 	struct lima_ip *ip = data;
 	struct lima_device *dev = ip->dev;
 	struct lima_sched_pipe *pipe = dev->pipe + lima_pipe_pp;
-	u32 state = pp_read(LIMA_PP_INT_STATUS);
+	u32 state;
+
+	/* One IRQ line is shared with the broadcast handler on MV100. Let
+	 * that handler account for each PP exactly once, including pipe->done.
+	 */
+	if (pipe->bcast_processor && ip->irq == pipe->bcast_processor->irq)
+		return IRQ_NONE;
+
+	state = pp_read(LIMA_PP_INT_STATUS);
 
 	/* for shared irq case */
 	if (!state)
@@ -65,14 +73,38 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 	struct lima_device *dev = pp_bcast->dev;
 	struct lima_sched_pipe *pipe = dev->pipe + lima_pipe_pp;
 	struct drm_lima_m450_pp_frame *frame;
+	unsigned int num_pp;
+	bool shared_gp_irq = pp_bcast->irq == dev->ip[lima_ip_gp].irq;
 
-	/* for shared irq case */
-	if (!pipe->current_task)
+	/* A completed job can already be freed while current_task still points
+	 * at it. An unrelated GP IRQ must not dereference that stale frame.
+	 */
+	if (atomic_read(&pipe->task) <= 0 || !pipe->current_task)
 		return IRQ_NONE;
 
 	frame = pipe->current_task->frame;
+	num_pp = frame->num_pp;
 
-	for (i = 0; i < frame->num_pp; i++) {
+	if (shared_gp_irq) {
+		bool pending = false;
+
+		/* The line may belong to GP/MMU while PP is being programmed.
+		 * First establish that at least one PP has an interrupt pending.
+		 * Other idle PPs may have no status bit and still be complete.
+		 */
+		for (i = 0; i < num_pp; i++) {
+			struct lima_ip *ip = pipe->processor[i];
+
+			if (pp_read(LIMA_PP_INT_STATUS)) {
+				pending = true;
+				break;
+			}
+		}
+		if (!pending)
+			return IRQ_NONE;
+	}
+
+	for (i = 0; i < num_pp; i++) {
 		struct lima_ip *ip = pipe->processor[i];
 		u32 status, state;
 
@@ -94,8 +126,11 @@ static irqreturn_t lima_pp_bcast_irq_handler(int irq, void *data)
 		}
 
 		pipe->done |= (1 << i);
-		if (atomic_dec_and_test(&pipe->task))
+		if (atomic_dec_and_test(&pipe->task)) {
 			lima_sched_pipe_task_done(pipe);
+			/* Signalling the fence can free the frame or start a new job. */
+			return IRQ_HANDLED;
+		}
 	}
 
 	return ret;

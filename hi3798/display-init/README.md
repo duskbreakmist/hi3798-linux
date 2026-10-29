@@ -1,8 +1,14 @@
 # MV100 display initialization and Lima checkpoint
 
-Latest desktop profile and GPU follow-up: `DESKTOP-PERFORMANCE-2026-10-29.md`.
-The deployed desktop now uses software modesetting with no Xorg shadow buffer
-and ray's software compositor disabled; the user confirmed improved response.
+Latest GPU result and method: `LIMA-APPS-2026-10-29.md`.
+The Lima-enabled DT now uses a single PP compatibility profile. Native Mesa
+EGL/GLES2, the packaged X11 triangle, Xorg glamor and physical scanout updates
+passed. Dual-PP completion remains unresolved; no sustained stability claim.
+
+Earlier CPU desktop profile: `DESKTOP-PERFORMANCE-2026-10-29.md`.
+The CPU fallback uses software modesetting with no Xorg shadow buffer;
+ray's compositor remains disabled in both profiles. The accepted GPU profile
+uses modesetting/glamor with a process-local generic KMSRO entry.
 Re-deployment and 4.4 recovery instructions are in `rootfs/README.md`.
 
 Read `RESULTS-2026-10-29.md` for the earlier display/one-frame GPU results, evidence paths,
@@ -31,7 +37,8 @@ Outputs are outside the checkout, in `../hi3798-linux-build/6.12-mv100/`:
 - `uImage-mv100-codex-display`: reserved 8 MiB framebuffer, automatic built-in
   display initialization, GPU DT node disabled.
 - `uImage-mv100-codex-lima`: the display path plus enabled Lima node, with the
-  MV100 shared PMU-domain fix. This remains an experimental candidate.
+  MV100 PMU-domain and shared-IRQ fixes. PP1 IRQs are deliberately omitted until
+  its completion issue is resolved; only PP0 is exposed to Mesa.
 - `uImage-mv100-codex` and `...-io`: no display reservation; the initialization
   helper detects that condition and skips register writes.
 
@@ -58,10 +65,11 @@ CPU cap and do not automatically enable 1200/1500 MHz experiments.
 ## Limits
 
 - Fixed 1920x1080p60 initialization, not full dynamic modesetting/hotplug.
-- GPU single-frame readback passed; no repeated rendering stress claim.
-- Software modesetting desktop works; the subsequent glamor/kmsro attempt
-  did not complete and a board reboot was observed. Its cause was not captured.
-  The board is back on the persisted GPU-disabled display kernel.
+- GPU single-frame readback and native EGL/GLES window passed with one PP.
+  Dual-PP completion errors remain open; no repeated rendering stress claim.
+- Glamor now works in the single-PP compatibility profile. The captured
+  shared-IRQ panic is fixed locally; subsequent PP1 completion timeouts led to
+  the current reduced-core DT. Earlier failed experiments remain documented.
 - The existing GPU clock-rate model still needs refinement; its reported
   200 MHz is not an external frequency measurement. A later read-only CRG
   snapshot showed status selector 6 (nominal 200 MHz per the MV100 SDK table).

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Render one verified GLES2 frame with the system's armhf Mesa/Lima stack.
+set -eu
+if [ ! -c /dev/dri/renderD128 ]; then
+    echo 'No renderD128: boot the MV100 Lima-enabled kernel first.' >&2
+    exit 1
+fi
+if [ ! -r /dev/dri/renderD128 ] || [ ! -w /dev/dri/renderD128 ]; then
+    echo 'No GPU permission: join the render group and log in again.' >&2
+    exit 1
+fi
+if [ "$#" -gt 1 ]; then
+    echo 'Usage: mv100-gles2-test [output.ppm]' >&2
+    exit 2
+fi
+if [ "$#" -eq 0 ]; then
+    mkdir -p "$HOME/hi3798-lima"
+    set -- "$HOME/hi3798-lima/gpu-result.ppm"
+fi
+exec /usr/local/libexec/mv100/lima-render-image "$1"

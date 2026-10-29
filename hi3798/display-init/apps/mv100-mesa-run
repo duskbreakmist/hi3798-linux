@@ -1,0 +1,19 @@
+#!/bin/sh
+# Process-local X11 Mesa/KMSRO selection for the experimental MV100 display.
+set -eu
+if [ "$#" -eq 0 ]; then
+    echo 'Usage: mv100-mesa-run X11-EGL/GLES-program [arguments...]' >&2
+    exit 2
+fi
+if [ ! -c /dev/dri/renderD128 ] || [ ! -r /dev/dri/renderD128 ] || [ ! -w /dev/dri/renderD128 ]; then
+    echo 'Lima renderD128 is required; check kernel and render-group membership.' >&2
+    exit 1
+fi
+if [ -z "${DISPLAY-}" ]; then
+    echo 'Run this windowed program inside the X11 desktop session.' >&2
+    exit 1
+fi
+# Mesa 22.3.6 has this generic KMSRO entry; the hardware is not PL111.
+# This override is confined to the child application and does not replace libs.
+export MESA_LOADER_DRIVER_OVERRIDE=pl111
+exec "$@"

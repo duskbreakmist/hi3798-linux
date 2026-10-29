@@ -24,3 +24,18 @@ status parameter and a live LightDM Xorg session. It briefly maps/destroys one
 update check, not a frame-rate or bandwidth benchmark. It temporarily covers the
 top-left corner. The tested profile is already accepted; do not repeat it as a
 stress loop.
+
+
+## Guarded GPU desktop trial
+
+Use the single-PP GPU kernel and an already working software desktop. Copy
+`try-lima-glamor-guarded.py`, `accept-lima-desktop.py`, `capture-es2tri.py`,
+`verify-direct-kms-window.py` and the rootfs `mv100-desktop-profile.py` to `/run`.
+The original first trial must have saved the CPU config in
+`/root/mv100-glamor-trial`; the acceptance helper uses its explicit `retry`
+action, waits for Xorg/LightDM readiness, checks the real EGL renderer,
+captures the packaged triangle, checks physical scanout and the kernel log,
+then enables the persistent profile only after all those steps pass.
+On failure it rolls back. Run only for a new candidate that needs validation;
+the deployed single-PP profile is already accepted, so do not repeat stress
+tests on it. MP2 and the earlier no-boot-guard trial are not the stable entry.

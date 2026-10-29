@@ -20,6 +20,17 @@ KMS = '''Section "Device"
     Option "SWcursor" "true"
 EndSection
 '''
+KMS_GPU = KMS.replace('"MV100 DRM software"', '"MV100 Lima KMS"').replace(
+    '    Option "AccelMethod" "none"\n    Option "ShadowFB" "false"',
+    '    Option "AccelMethod" "glamor"')
+XORG_WRAPPER = '''#!/bin/sh
+# MV100 process-local KMSRO; the old 4.4 recovery path uses plain Xorg.
+if [ -c /dev/dri/renderD128 ] &&
+   grep -q 'Option "AccelMethod" "glamor"' /etc/X11/xorg.conf.d/10-fbdev.conf; then
+    exec env MESA_LOADER_DRIVER_OVERRIDE=pl111 /usr/lib/xorg/Xorg "$@"
+fi
+exec /usr/lib/xorg/Xorg "$@"
+'''
 UNIT = '''[Unit]
 Description=Select MV100 Xorg backend for the running kernel
 After=local-fs.target systemd-udev-trigger.service
@@ -55,16 +66,21 @@ def select(force_legacy=False):
         while not driver.exists() and time.monotonic() < deadline:
             time.sleep(0.1)
     direct = modern and driver.exists() and driver.resolve().name == 'simple-framebuffer'
-    data = KMS.encode() if direct else legacy.read_bytes()
+    gpu_driver = Path('/sys/class/drm/renderD128/device/driver')
+    gpu = (direct and (ROOT/'glamor-enabled').is_file() and gpu_driver.exists()
+           and gpu_driver.resolve().name == 'lima')
+    data = (KMS_GPU if gpu else KMS).encode() if direct else legacy.read_bytes()
     if not CONFIG.exists() or CONFIG.read_bytes() != data:
         atomic_write(CONFIG, data)
-    print('MV100 Xorg profile: ' + ('modesetting, CPU rendering, no shadow' if direct else 'legacy fbdev'))
+    print('MV100 Xorg profile: ' + ('modesetting, Lima glamor' if gpu else
+          'modesetting, CPU rendering, no shadow' if direct else 'legacy fbdev'))
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action', choices=['install', 'select', 'legacy'])
+    p.add_argument('action', choices=['install', 'select', 'legacy', 'cpu'])
     p.add_argument('--legacy-config', type=Path)
+    p.add_argument('--enable-glamor', action='store_true', help='Opt in after successful GPU desktop trial')
     args = p.parse_args()
     if os.geteuid() != 0:
         raise SystemExit('Run as root')
@@ -83,6 +99,17 @@ def main():
             atomic_write(saved, data)
         if not saved.is_file():
             raise SystemExit('First install requires --legacy-config pointing to the original fbdev file')
+        if args.enable_glamor:
+            driver = Path('/sys/class/drm/renderD128/device/driver')
+            if not driver.exists() or driver.resolve().name != 'lima':
+                raise SystemExit('Enabling glamor requires the Lima-enabled kernel')
+            wrapper = Path('/usr/local/sbin/Xorg-mv100-lima')
+            atomic_write(wrapper, XORG_WRAPPER.encode())
+            wrapper.chmod(0o755)
+            seat = Path('/etc/lightdm/lightdm.conf.d/90-mv100-lima.conf')
+            seat.parent.mkdir(parents=True, exist_ok=True)
+            atomic_write(seat, b'[Seat:*]\nxserver-command=/usr/local/sbin/Xorg-mv100-lima\n')
+            atomic_write(ROOT/'glamor-enabled', b'Accepted MV100 Lima desktop profile\n')
         target = ROOT / 'profile.py'
         if Path(__file__).resolve() != target:
             shutil.copyfile(__file__, target)
@@ -90,6 +117,8 @@ def main():
         atomic_write(SERVICE, UNIT.encode())
         subprocess.run(['systemctl', 'daemon-reload'], check=True)
         subprocess.run(['systemctl', 'enable', SERVICE.name], check=True)
+    if args.action == 'cpu':
+        (ROOT/'glamor-enabled').unlink(missing_ok=True)
     select(force_legacy=args.action == 'legacy')
 
 

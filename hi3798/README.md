@@ -1,71 +1,109 @@
-# Hi3798MV100 independent kernel development
+# Hi3798MV100 Linux 6.12 port and developer workflow
 
-Status: stage 1 offline MV100 candidate. Machine/SMP/clock sources and two
-board DTBs are integrated and compiled. No new kernel boot has been validated.
-The original build-only baseline remains available; do not flash either image.
+源码仓库：https://github.com/duskbreakmist/hi3798-linux
 
-The `upstream` remote is kernel.org stable Linux. `stable-mirror` is the official
-GitHub stable mirror. `community` is loonpn/ec6108v9c-linux-kernel, used as a
-pinned reference rather than merged wholesale. The initial checkout is shallow;
-deepen the upstream history when needed for bisect or rebasing.
+日常分支：`codex/hi3798-6.12-bringup`，基于 gregkh/linux 的 Linux **6.12.114**。这是完整内核源码的 fork，加上本板移植提交；没有向上游发起 PR，也不需要先 `git pull` 更新版本。
 
-Build in WSL as ray with the Ubuntu arm-linux-gnueabihf GCC toolchain:
+本机 WSL 源码：`/home/ray/workplace/hi3798-linux`。默认编译目录：`/home/ray/workplace/hi3798-linux-build/6.12-mv100`。默认 bootloader profile 保留从 fastboot 环境选择 eMMC/SSD 根分区的方式；它不写入 bootcmd。
 
-```sh
-bash hi3798/build.sh configure
-bash hi3798/build.sh build
+## 日常操作
+
+在 WSL Ubuntu-24.04 中，以 ray 普通用户运行，不用 sudo：
+
+```bash
+cd ~/workplace/hi3798-linux
+./1start_menuconfig.sh     # 首次生成配置；已有配置则保留，进入菜单
+./2just_menuconfig.sh      # 继续调整当前输出目录的配置
+./3start_make_cp.sh        # 保存配置、编译、打包、复制镜像到输出目录
 ```
 
-Outputs default to `../hi3798-linux-build/6.12-baseline`. Override OUT_DIR,
-CROSS_COMPILE or JOBS as needed. The scripts do not deploy, mount a rootfs,
-write boot partitions or modify the SDK.
+菜单中 Y 是内置，M 是模块，N 是关闭。退出时保存。三个脚本都位于内核源码根目录，名字沿用旧 SDK；**不会执行 distclean，不会刷板，不会重启板子**。第 1、2 个脚本退出菜单后自动保存可跟踪配置；第 3 个再次保存、编译并生成发布目录。
 
-`baseline.config` deliberately exercises Btrfs/Zstd, container prerequisites and
-Lima compilation. A successful build does not establish that those features or
-the board work at runtime. The saved configuration check is not a Docker
-compatibility certification.
-
-Next: audit and port MV100 machine/SMP/cache setup, clock/reset, board DTS,
-USB/eMMC and Ethernet; then validate the board before enabling experimental GPU
-or mounting existing data volumes. Keep the SDK 4.4 kernel available for recovery.
-
-The source provenance and community-file triage are in manifest.json and
-community-audit.json. Preserve author/license headers when importing patches.
-
-## MV100 RAM diagnostic candidate
-
-```sh
-bash hi3798/build-mv100.sh configure
-bash hi3798/build-mv100.sh build
+```bash
+./3start_make_cp.sh --save-only         # 类似旧 SDK 的第 3 个脚本：仅保存，不编译
+./1start_menuconfig.sh --reset         # 备份当前配置，再从项目配置和用户改动重建
+JOBS=14 ./3start_make_cp.sh             # 指定并行编译数
+./3start_make_cp.sh --copy-to /mnt/h/tftp/hi_kernel.bin
 ```
 
-The default output is ../hi3798-linux-build/6.12-mv100. Candidate uImages use
-the SDK fastboot's legacy ARM/Linux format: payload load/entry 0x02000000,
-uncompressed wrapper around zImage plus appended DTB. A static /init is embedded.
-The diagnostic DTB enables UART/timer only; the optional -io DTB also probes
-USB, conservative 25 MHz eMMC and Ethernet. Both force a RAM-root command line
-with maxcpus=1 and mem=512M, irrespective of the old rootfs boot arguments.
+`--copy-to` 只复制文件；目录已存在时写入其下 `hi_kernel.bin`，否则按文件名处理。源目录之外的默认构建目录中也会生成 `hi_kernel.bin`，不必使用此参数。
 
-No media, display, sound or GPU node is enabled. SMP reset code is compiled but
-not exercised by the default candidate. CPU hotplug is disabled. Cache setup is
-the normal mainline Cortex-A7 path; cache/coherency correctness remains untested.
-The first kernel prints SCTLR/ACTLR values for later hardware review.
+默认镜像为 **codex-lima-mp2**。需要其他设备树时使用 `--variant codex-lima` 等；默认日常配置保留 MP2 GPU 与显示初始化。`--variant` 选择打包的 DT，不会自动更改内核 Kconfig。
 
-Use the Windows workspace's serial_ram_boot.py only after agreeing on a
-service interruption and physical power-cycle recovery. It can transfer via
-YMODEM to RAM 0x10000000 and bootm that address; it has no flash/saveenv operation.
-A stall may require a physical reset/power cycle. The saved old boot path is
-unchanged. Never assume the existing SSD or eMMC rootfs is safe to mount merely
-because this offline build succeeded.
+## 配置保存与 Git
 
-## SSD flash checkpoint (2026-10-28)
+| 文件 | 用途 |
+| --- | --- |
+| `hi3798/mv100.config` 等 | 项目基础配置和启动 profile |
+| `hi3798/configs/bootloader.override.config` | menuconfig 相对于基础配置的改动；包含对已固定选项的修改 |
+| `hi3798/configs/bootloader.config` | 实际完整配置快照 |
+| `arch/arm/configs/hi3798mv100_codex_defconfig` | Kconfig 生成的最小 defconfig |
+| 输出目录 `.config` | 当前实际编译配置 |
+| 输出目录 `config-backups/` | 每次操作前的配置备份，不进 Git |
 
-build-mv100.sh configure/build now defaults to the SSD profile (root=/dev/sda4).
-MV100_PROFILE=direct retains eMMC root; MV100_PROFILE=diagnostic builds RAM init.
-Required host packages include the ARM cross toolchain, make, Python and libssl-dev.
-RTL8188E NIC firmware is embedded from the existing SDK; provenance is under
-hi3798/firmware/rtlwifi/. Firmware sources and board MAC are specific to this target.
-NTFS3, FUSE, rtl8xxxu and HID are built in. GPU is compiled in but its DT node is
-disabled: one Mesa draw passed, subsequent repeated draws hung the board.
-Do not enable it by default or claim display/media support. No DVFS is enabled.
-The user's validation policy is one basic test per feature, without repeated stress.
+基础配置、profile、用户 override 依次合并。保存时通过 Kconfig 重新生成，并逐项比较配置，确认改动能恢复后才更新源码中的保存文件。因此重新 configure 不会把已保存的 menuconfig 修改覆盖掉。关键启动选项仍由 `verify-mv100.py` 检查；禁用它们会阻止保存和编译，避免生成明显不能启动的配置。
+
+修改后可自己提交：
+
+```bash
+git diff --stat
+git diff -- hi3798/configs/bootloader.override.config
+git add hi3798/configs/bootloader.override.config hi3798/configs/bootloader.config arch/arm/configs/hi3798mv100_codex_defconfig
+git commit -m "arm: hi3798: update daily kernel configuration"
+git push
+```
+
+首次克隆此移植分支：
+
+```bash
+git clone --single-branch --branch codex/hi3798-6.12-bringup https://github.com/duskbreakmist/hi3798-linux.git
+cd hi3798-linux
+```
+
+建议完整保留当前 6.12.114 基础，后续升级补丁版本单独开分支处理。不要在日常分支直接 pull 上游 master；它不是本板使用的 6.12 移植分支。`origin` 指向个人 fork，`upstream` 指向 kernel.org 稳定源码。
+
+## 编译依赖与 SDK
+
+Ubuntu 24.04：
+
+```bash
+sudo apt install build-essential gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf libncurses-dev flex bison bc libssl-dev libelf-dev python3 u-boot-tools device-tree-compiler rsync kmod
+```
+
+日常配置启用了 SDK 衍生的显示初始化。虽然 Linux/DRM/Lima 源码已在仓库中，**显示初始化仍需要原 HiSTBLinux SDK 的准备好的 boot 源码目录**，不能把它描述为完全脱离 SDK 的显示驱动。原始 SDK 源码、libdisp.a/libhdmi.a 等构建文件没有上传到此 fork；脚本只读取库中的对象名，再从 SDK 源码重新编译。
+
+默认查找内核源码同级的 `HiSTBLinux`；可改为：
+
+```bash
+export MV100_SDK_ROOT=/path/to/HiSTBLinux
+# 若 SDK boot 输出布局不同，可再指定：
+export MV100_SDK_BOOT=/path/to/prepared/obj/source/boot
+```
+
+支持 `CROSS_COMPILE`、`OUT_DIR`、`JOBS`。输出目录必须在源码树外。不同 profile 使用单独 `OUT_DIR`，或显式 `1start_menuconfig.sh --profile ssd --reset`；后续命令使用同一 `--profile`。日常推荐 bootloader profile。
+
+SDK 的重新编译日志默认在生成对象旁的 `vendor/reports/`，不再依赖 Windows H 盘；也可设置 `MV100_REPORT_DIR`。
+
+## 编译输出与部署边界
+
+```text
+../hi3798-linux-build/6.12-mv100/
+  hi_kernel.bin                 # 默认 codex-lima-mp2 的 uImage，可交给已有 TFTP/烧写流程
+  release/latest/               # 指向此次发布目录
+    hi_kernel.bin
+    uImage-mv100-*
+    kernel.config
+    defconfig
+    build.json                  # 源码提交、是否有未提交修改、镜像/配置 SHA256
+    modules/lib/modules/...     # 同一次编译的模块
+```
+
+发布脚本只在离线输出目录安装模块；不会覆盖板上 `/lib/modules`。若启用 M，部署内核时需要同步对应 kernel release 的模块。仅复制镜像不能部署新增模块。
+
+## 当前硬件边界
+
+截至本次发布前的实机记录：1 GiB RAM、CPU 日常上限 **1 GHz**、eMMC 50 MHz、Mali-450 MP2 200–400 MHz devfreq。1.2 GHz 压测曾失败，1.5 GHz 也未稳定，不能宣称支持日常运行。显示路径为 simpledrm 加 SDK 衍生 HDMI/G0 初始化，固定 1080p60；MP2 包含本芯片完成轮询补偿。细节见源码 `hi3798/display-init/` 中研究记录。本次任务只整理源码和编译流程，没有重新烧写或改变这些运行策略。
+
+## 本次验证
+
+完成当前日常配置保存/完整重建比对，以及将基础配置中 `PRINTK_TIME=y` 改为关闭、保存、reset 后保持关闭，再恢复日常配置的往返检查。另执行一次完整构建入口的增量编译、DT 校验、镜像打包和模块发布目录生成。没有重复板上测试。

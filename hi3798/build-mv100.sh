@@ -9,7 +9,7 @@ export KBUILD_BUILD_TIMESTAMP='2026-10-27 00:00:00 +0000'
 export SOURCE_DATE_EPOCH=1793059200
 export KBUILD_BUILD_VERSION=1
 action=${1:-build}
-profile=${MV100_PROFILE:-ssd}
+profile=${MV100_PROFILE:-bootloader}
 mkdir -p "$out"
 case "$action" in
   configure)

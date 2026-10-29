@@ -1,5 +1,5 @@
 {
-  "status": "mv100-offline-candidate-not-boot-tested",
+  "status": "mv100-board-tested-downstream-port",
   "upstream_commit": "85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e",
   "source_archive_sha256": "95a588fc1ffa31df0db5ad06075c3d34b0d007007d5fce809bdd2e50bb2a3b7c",
   "community_commit": "8677b406968bd7d53b436598c99d7ffe05a3d3d2",
@@ -8,11 +8,17 @@
   "compiler": "arm-linux-gnueabihf-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
   "branch": "codex/hi3798-6.12-bringup",
   "history": "shallow upstream commit; original commit and tree preserved",
-  "validated_on_board": false,
+  "validated_on_board": true,
   "upstream_tree": "2c29e16ea9461ea22e0d547ae9c7447d7e851e43",
   "bootstrap_method": "archive plus exact tree and original unsigned commit hash verification",
   "active_mv100_port_imported": true,
-  "current_profile": "hi3798/mv100.config",
-  "diagnostic_boot": "forced ramfs, 512 MiB, maxcpus=1, no block mounts",
-  "serial_port": "COM8 115200 8N1; receive path verified by SSH marker"
+  "current_profile": "bootloader + hi3798/configs/bootloader.override.config",
+  "diagnostic_boot": "Historical early-stage diagnostic profile; not the daily bootloader profile",
+  "serial_port": "COM8 115200 8N1; receive path verified by SSH marker",
+  "current_hardware": "1 GiB RAM; CPU 1 GHz; eMMC 50 MHz; Mali450 MP2 200-400 MHz; simpledrm + SDK display initialization",
+  "limitations": [
+    "CPU 1.2/1.5 GHz not stable; daily cap remains 1 GHz",
+    "Display initialization still requires external prepared HiSTBLinux SDK sources",
+    "MP2 requires MV100 completion polling workaround; not a generic upstream Lima change"
+  ]
 }

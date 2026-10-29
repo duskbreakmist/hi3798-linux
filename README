@@ -1,3 +1,15 @@
+Hi3798MV100 downstream kernel (Linux 6.12.114)
+============================================
+
+Repository: https://github.com/duskbreakmist/hi3798-linux
+Branch: codex/hi3798-6.12-bringup
+Build and menuconfig guide: hi3798/README.md
+Convenience entry points: ./1start_menuconfig.sh, ./2just_menuconfig.sh,
+./3start_make_cp.sh. Run as a normal user; outputs remain outside this tree.
+Display initialization currently requires an external prepared HiSTBLinux SDK.
+
+Upstream Linux documentation follows.
+
 Linux kernel
 ============
 

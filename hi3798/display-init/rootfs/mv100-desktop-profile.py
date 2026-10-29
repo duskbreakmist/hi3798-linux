@@ -27,6 +27,10 @@ XORG_WRAPPER = '''#!/bin/sh
 # MV100 process-local KMSRO; the old 4.4 recovery path uses plain Xorg.
 if [ -c /dev/dri/renderD128 ] &&
    grep -q 'Option "AccelMethod" "glamor"' /etc/X11/xorg.conf.d/10-fbdev.conf; then
+    preload=/usr/local/lib/mv100/libkmsro-lima-select.so
+    if [ -r "$preload" ]; then
+        exec env MESA_LOADER_DRIVER_OVERRIDE=pl111 MV100_KMSRO_LIMA_ONLY=1 LD_PRELOAD="$preload${LD_PRELOAD:+:$LD_PRELOAD}" /usr/lib/xorg/Xorg "$@"
+    fi
     exec env MESA_LOADER_DRIVER_OVERRIDE=pl111 /usr/lib/xorg/Xorg "$@"
 fi
 exec /usr/lib/xorg/Xorg "$@"

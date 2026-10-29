@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <linux/clk.h>
+#include <linux/of.h>
+#include <linux/slab.h>
 #include <linux/of_clk.h>
 #include <linux/minmax.h>
 #include <linux/of_address.h>
@@ -1054,10 +1056,28 @@ static struct simpledrm_device *simpledrm_device_create(struct drm_driver *drv,
  * DRM driver
  */
 
+/* MV100 scanout BOs are exported to a non-coherent Lima GPU. DMA-buf
+ * imports use WC mappings, so the local CPU shadow mapping must also be WC:
+ * a cached local alias can copy stale wallpaper/cursor pixels after rendering.
+ * Other machines retain the upstream cached shmem allocation policy.
+ */
+static struct drm_gem_object *simpledrm_gem_create_object(struct drm_device *dev,
+                                                        size_t size)
+{
+    struct drm_gem_shmem_object *shmem;
+
+    shmem = kzalloc(sizeof(*shmem), GFP_KERNEL);
+    if (!shmem)
+        return ERR_PTR(-ENOMEM);
+    shmem->map_wc = of_machine_is_compatible("hisilicon,hi3798mv100");
+    return &shmem->base;
+}
+
 DEFINE_DRM_GEM_FOPS(simpledrm_fops);
 
 static struct drm_driver simpledrm_driver = {
 	DRM_GEM_SHMEM_DRIVER_OPS,
+    .gem_create_object = simpledrm_gem_create_object,
 	.name			= DRIVER_NAME,
 	.desc			= DRIVER_DESC,
 	.date			= DRIVER_DATE,

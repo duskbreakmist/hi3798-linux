@@ -6,6 +6,8 @@ import sys
 config = pathlib.Path(sys.argv[1])
 subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name('verify-config.py')), str(config)], check=True)
 values = dict(line.split('=', 1) for line in config.read_text().splitlines() if line.startswith('CONFIG_') and '=' in line)
+if values.get('CONFIG_FUNCTION_TRACER') == 'y':
+    assert values.get('CONFIG_DYNAMIC_FTRACE') == 'y', 'MV100 requires dynamic function tracing'
 required = ['CONFIG_MACH_HI3798MV100', 'CONFIG_COMMON_CLK_HI3798MV100',
             'CONFIG_ARM_APPENDED_DTB', 'CONFIG_ARM_THUMB',
             'CONFIG_HISI_FEMAC', 'CONFIG_MDIO_HISI_FEMAC', 'CONFIG_MMC_BLOCK',

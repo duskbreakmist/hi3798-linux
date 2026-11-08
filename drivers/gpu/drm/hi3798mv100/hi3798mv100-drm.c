@@ -143,11 +143,12 @@ static int plane_check(struct drm_plane *plane,struct drm_atomic_state *state)
  }
  return 0;
 }
+static void plane_disable(struct drm_plane *plane,struct drm_atomic_state *state);
 static void plane_update(struct drm_plane *plane,struct drm_atomic_state *state)
 {
  struct mv100_drm *d=to_mv(plane->dev);struct drm_plane_state *s=plane->state;
  u32 w=s->src_w>>16,h=s->src_h>>16,x=s->crtc_x,y=s->crtc_y;
- if(!s->visible)return;
+ if(!s->visible){plane_disable(plane,state);return;}
  if(plane==&d->primary){
   u32 alpha=255;
   if(s->fb->format->format==DRM_FORMAT_ARGB8888)alpha|=BIT(12)|BIT(13);
@@ -213,7 +214,7 @@ static void flush(struct drm_crtc *crtc,struct drm_atomic_state *state)
 {
  struct mv100_drm *d=to_mv(crtc->dev);unsigned long flags;u32 latch=d->dirty;
  spin_lock_irqsave(&d->drm.event_lock,flags);
- if(d->video.state->crtc&&d->video.state->fb)
+ if(d->video.state->visible&&d->video.state->crtc&&d->video.state->fb)
   bits(d,CBM_MIX,0xff,d->primary.state->normalized_zpos>d->video.state->normalized_zpos?0x21:0x12);
  if(d->dirty&1)bits(d,G_UPD,1,1);
  if(d->dirty&2)bits(d,V_UPD,1,1);
@@ -237,6 +238,9 @@ static void crtc_disable(struct drm_crtc *crtc,struct drm_atomic_state *state)
  bits(d,G_CTRL,BIT(31),0);bits(d,V_CTRL,BIT(31),0);bits(d,G_UPD,1,1);bits(d,V_UPD,1,1);
  spin_lock_irqsave(&d->drm.event_lock,flags);
  if(d->event){drm_crtc_send_vblank_event(crtc,d->event);d->event=NULL;}
+ if(crtc->state->event){
+  drm_crtc_send_vblank_event(crtc,crtc->state->event);crtc->state->event=NULL;
+ }
  if(d->event_ref){d->event_ref=false;drm_crtc_vblank_put(crtc);}
  spin_unlock_irqrestore(&d->drm.event_lock,flags);
  drm_crtc_vblank_off(crtc);d->active=false;

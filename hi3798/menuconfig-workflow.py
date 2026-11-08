@@ -152,7 +152,7 @@ def main() -> None:
     parser.add_argument('--reset', action='store_true', help='备份当前.config后，从项目及已保存用户配置重新生成')
     parser.add_argument('--no-ui', action='store_true', help='只运行olddefconfig并保存，用于非交互检查')
     parser.add_argument('--save-only', action='store_true', help='只保存配置，不编译')
-    parser.add_argument('--variant', choices=['codex', 'codex-io', 'codex-display', 'codex-lima', 'codex-lima-mp2'], default=os.environ.get('MV100_DTB_VARIANT', 'codex-lima-mp2'))
+    parser.add_argument('--variant', choices=['codex', 'codex-io', 'codex-display', 'codex-lima', 'codex-lima-mp2', 'codex-native'], default=os.environ.get('MV100_DTB_VARIANT', 'codex-lima-mp2'))
     parser.add_argument('--copy-to', type=Path, help='另复制hi_kernel.bin到指定文件或已有目录，不烧写')
     args = parser.parse_args()
     if os.geteuid() == 0:
@@ -183,6 +183,10 @@ def main() -> None:
             execute(['bash', str(HERE / 'build-mv100.sh'), 'configure'], env)
         metadata.write_text(args.profile + '\n')
         print(f'源码：{SRC}\n输出：{out}\nprofile：{args.profile}', flush=True)
+        if args.variant == 'codex-native':
+            execute([str(SRC/'scripts/config'), '--file', str(out/'.config'),
+                     '--enable', 'DRM_HI3798MV100', '--enable', 'VIDEOBUF2_DMA_CONTIG'], env)
+            make(out, 'olddefconfig', env)
         if args.action in ['start', 'continue']:
             make(out, 'olddefconfig' if args.no_ui else 'menuconfig', env)
         save(out, args.profile, env)

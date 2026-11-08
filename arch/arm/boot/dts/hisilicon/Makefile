@@ -13,3 +13,5 @@ dtb-$(CONFIG_ARCH_SD5203) += \
 	sd5203.dtb
 
 dtb-$(CONFIG_MACH_HI3798MV100) += hi3798mv100-codex.dtb hi3798mv100-codex-io.dtb
+
+dtb-$(CONFIG_MACH_HI3798MV100) += hi3798mv100-codex-native.dtb

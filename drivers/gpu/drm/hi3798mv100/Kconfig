@@ -1,0 +1,9 @@
+config DRM_HI3798MV100
+ bool "Hi3798MV100 native atomic VDP scanout (experimental)"
+ depends on DRM && MACH_HI3798MV100 && HI3798MV100_DISPLAY_INIT
+ select DRM_KMS_HELPER
+ select DRM_GEM_DMA_HELPER
+ select DRM_FBDEV_DMA if DRM_FBDEV_EMULATION
+ help
+   Native RGB scanout, VDP vblank/page flip and a linear NV12 video plane.
+   Currently uses the existing local bridge for HDMI timing initialization.

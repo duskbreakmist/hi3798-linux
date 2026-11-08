@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+#include "hi3798mv100-codex-lima-mp2.dts"
+/ {
+ model = "Hi3798MV100 native VDP DRM test";
+ chosen {
+  framebuffer@3e000000 { status = "disabled"; };
+ };
+ soc {
+  display@f8cc0000 {
+   compatible = "hisilicon,hi3798mv100-drm";
+   reg = <0xf8cc0000 0x10000>;
+   interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>;
+   status = "okay";
+  };
+ };
+};

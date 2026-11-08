@@ -224,3 +224,5 @@ obj-y			+= solomon/
 obj-$(CONFIG_DRM_SPRD) += sprd/
 obj-$(CONFIG_DRM_LOONGSON) += loongson/
 obj-$(CONFIG_DRM_POWERVR) += imagination/
+
+obj-$(CONFIG_DRM_HI3798MV100) += hi3798mv100/

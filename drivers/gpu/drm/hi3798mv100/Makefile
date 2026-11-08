@@ -1,0 +1,1 @@
+obj-$(CONFIG_DRM_HI3798MV100) += hi3798mv100-drm.o

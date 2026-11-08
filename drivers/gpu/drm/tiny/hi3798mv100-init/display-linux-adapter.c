@@ -28,6 +28,14 @@ module_param(direct_pattern, bool, 0444);
 MODULE_PARM_DESC(enable, "Explicitly enable experimental HDMI background initialization");
 static bool opened;
 static bool gfx_active;
+
+bool mv100_display_is_ready(void);
+
+bool mv100_display_is_ready(void)
+{
+    return opened && gfx_active;
+}
+
 static int display_status(char *buffer, const struct kernel_param *parameter)
 {
     void __iomem *fb;
